@@ -22,6 +22,7 @@ class FloraeApp extends StatelessWidget {
     return MaterialApp(
       title: 'Florae',
       theme: ThemeData(
+        primaryColor: Colors.teal,
         // This is the theme of your application.
         //
         // Try running your application with "flutter run". You'll see the
@@ -32,6 +33,7 @@ class FloraeApp extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
+        fontFamily: "NotoSans",
         scaffoldBackgroundColor: Colors.grey[100]
       ),
       home: FutureBuilder(

@@ -1,5 +1,5 @@
-import 'package:florae/plant.dart';
-import 'package:florae/plant_repository.dart';
+import 'package:florae/data/plant.dart';
+import 'package:florae/data/plant_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sembast/sembast.dart';
 

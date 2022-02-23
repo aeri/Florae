@@ -4,8 +4,8 @@ import 'package:sembast/sembast_io.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'app_databse.dart';
-import 'home_page.dart';
+import 'data/app_databse.dart';
+import 'screens/home_page.dart';
 
 Future<void> main() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +32,7 @@ class FloraeApp extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.grey[100]
       ),
       home: FutureBuilder(
         future: _init,

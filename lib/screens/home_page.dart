@@ -1,11 +1,13 @@
 
 import 'dart:math';
 
-import 'package:florae/plant_repository.dart';
+import 'package:florae/data/plant_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:florae/plant.dart';
+import 'package:florae/data/plant.dart';
 import 'package:sembast/timestamp.dart';
+
+import 'manage_plant.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -26,7 +28,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  PlantRepository _plantRepository = GetIt.I.get();
+  final PlantRepository _plantRepository = GetIt.I.get();
   List<Plant> _plants = [];
   int _counter = 0;
 
@@ -83,19 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
             tooltip: 'Go to the next page',
             onPressed: () {
               Navigator.push(context, MaterialPageRoute<void>(
-                builder: (BuildContext context) {
-                  return Scaffold(
-                    appBar: AppBar(
-                      title: const Text('Next page'),
-                    ),
-                    body: const Center(
-                      child: Text(
-                        'This is the next page',
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ),
-                  );
-                },
+                builder: (context) => ManagePlantScreen(title: "Manage plant"),
               ));
             },
           ),
@@ -104,23 +94,51 @@ class _MyHomePageState extends State<MyHomePage> {
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0.0,
       ),
-      body: ListView.builder(
+      body: GridView.builder(
         itemCount: _plants.length,
         itemBuilder: (context, index) {
           final plant = _plants[index];
-          return ListTile(
-            title: Text(plant.name),
-            subtitle: Text("Intensity: ${plant.intensity}"),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () => _deletePlant(plant),
+          return Card(
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
-            leading: IconButton(
-              icon: Icon(Icons.thumb_up),
-              onPressed: () => _editPlant(plant),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.arrow_drop_down_circle),
+                  title: Text(plant.name),
+                  subtitle: Text(
+                    plant.location ?? "Unknown",
+                    style: TextStyle(color: Colors.black.withOpacity(0.6)),
+                  ),
+                ),
+                plant.description.isEmpty ? Container(height:0) :
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    plant.description,
+                    style: TextStyle(color: Colors.black.withOpacity(0.6)),
+                  ),
+                ),
+                ButtonBar(
+                  alignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () => _deletePlant(plant),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.refresh),
+                      onPressed: () => _editPlant(plant),
+                    ),
+                  ],
+                ),
+                Image.asset('assets/card-sample-image.jpg'),
+              ],
             ),
           );
-        },
+        }
       ),
       bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[

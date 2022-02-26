@@ -1,15 +1,23 @@
+import 'dart:isolate';
 import 'package:flutter/material.dart';
-import 'package:sembast/sembast.dart';
-import 'package:sembast/sembast_io.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-
 import 'data/app_databse.dart';
 import 'screens/home_page.dart';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+
+void printHello() {
+  final DateTime now = DateTime.now();
+  final int isolateId = Isolate.current.hashCode;
+  print("[$now] Hello, world! isolate=${isolateId} function='$printHello'");
+}
 
 Future<void> main() async {
     WidgetsFlutterBinding.ensureInitialized();
+
+    await AndroidAlarmManager.initialize();
+
     runApp(FloraeApp());
+    final int helloAlarmID = 0;
+    await AndroidAlarmManager.periodic(const Duration(seconds: 10), helloAlarmID, printHello);
 }
 
 class FloraeApp extends StatelessWidget {

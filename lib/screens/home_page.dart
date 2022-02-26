@@ -26,6 +26,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final PlantRepository _plantRepository = GetIt.I.get();
   List<Plant> _plants = [];
+  List<Plant> _plantsFiltered = [];
   int _selectedIndex = 0;
 
   @override
@@ -46,21 +47,25 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           SvgPicture.asset(
-          _selectedIndex == 0 ? "assets/undraw_fall_thyk.svg" : "assets/undraw_gardening_re_e658.svg",
-          semanticsLabel: 'Fall',
+            _selectedIndex == 0
+                ? "assets/undraw_fall_thyk.svg"
+                : "assets/undraw_gardening_re_e658.svg",
+            semanticsLabel: 'Fall',
             alignment: Alignment.center,
             height: 250,
-      ),
-          SizedBox(
+          ),
+          const SizedBox(
             height: 20,
           ),
           Text(
-            _selectedIndex == 0 ? 'Hurray! You don\'t have any pending plants to water!' : 'The garden is empty, what if you plant something?',
-            style: TextStyle(
+            _selectedIndex == 0
+                ? 'Yay! You don\'t have any pending plants to water!'
+                : 'The garden is empty, what if you plant something?',
+            style: const TextStyle(
               fontFamily: 'NotoSans',
               fontWeight: FontWeight.w600,
-              fontSize: 14,
-              color: const Color(0x78000000),
+              fontSize: 25,
+              color: Color(0x78000000),
               height: 1.4285714285714286,
             ),
             textAlign: TextAlign.center,
@@ -84,7 +89,10 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(_selectedIndex == 0 ? "Today" : "Garden"),
         titleTextStyle: const TextStyle(
-            color: Colors.black54, fontSize: 40, fontWeight: FontWeight.w800, fontFamily: "NotoSans"),
+            color: Colors.black54,
+            fontSize: 40,
+            fontWeight: FontWeight.w800,
+            fontFamily: "NotoSans"),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.calendar_today),
@@ -108,14 +116,14 @@ class _MyHomePageState extends State<MyHomePage> {
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0.0,
       ),
-      body:
-      _plants.length == 0 ? noPlants() :
-      GridView.count(
-          crossAxisCount: 2,
-          padding: const EdgeInsets.all(16.0),
-          childAspectRatio: 8.0 / 9.0,
-          children: _buildGridCards(context) // Changed code
-          ),
+      body: _plants.length == 0
+          ? noPlants()
+          : GridView.count(
+              crossAxisCount: 2,
+              padding: const EdgeInsets.all(16.0),
+              childAspectRatio: 8.0 / 9.0,
+              children: _buildGridCards(context) // Changed code
+              ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -158,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _deletePlant(Plant plant) async {
-    print(await _plantRepository.deletePlant(plant.name));
+    await _plantRepository.deletePlant(plant.name);
     _loadPlants();
   }
 

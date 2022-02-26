@@ -4,15 +4,17 @@ class Plant {
   String name;
   String? location;
   String description;
-  int intensity;
+  int cycles;
   Timestamp createdAt;
+  Timestamp? watered;
 
   Plant({
     required this.name,
     this.location,
     this.description = "",
-    this.intensity = 0,
+    this.cycles = 0,
     required this.createdAt,
+    this.watered
   });
 
   factory Plant.fromJson(Map<String, dynamic> json) =>
@@ -20,8 +22,9 @@ class Plant {
           name: json["name"],
           location: json["location"],
           description: json["description"],
-          intensity: json["intensity"],
-          createdAt: json["createdAt"]
+          cycles: json["intensity"],
+          createdAt: json["createdAt"],
+          watered: json["watered"]
       );
 
   Map<String, dynamic> toJson() =>
@@ -29,7 +32,8 @@ class Plant {
         "name": name,
         "location": location,
         "description": description,
-        "intensity": intensity,
-        "createdAt": createdAt
+        "intensity": cycles,
+        "createdAt": createdAt,
+        "watered": watered
       };
 }

@@ -40,6 +40,7 @@ dependencies:
   image_picker: ^0.8.4+9
   numberpicker: ^2.0.1
   flutter_svg: ^1.0.3
+  intl: ^0.17.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

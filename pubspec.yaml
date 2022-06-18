@@ -70,6 +70,15 @@ flutter:
     - assets/card-sample-image.jpg
     - assets/undraw_fall_thyk.svg
     - assets/undraw_gardening_re_e658.svg
+    - assets/undraw_flowers_vx06.svg
+    - assets/florae_avatar (1).png
+    - assets/florae_avatar (2).png
+    - assets/florae_avatar (3).png
+    - assets/florae_avatar (4).png
+    - assets/florae_avatar (5).png
+    - assets/florae_avatar (6).png
+    - assets/florae_avatar (7).png
+    - assets/florae_avatar (8).png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

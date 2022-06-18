@@ -7,6 +7,7 @@ class Plant {
   int cycles;
   Timestamp createdAt;
   Timestamp? watered;
+  String? picture;
 
   Plant({
     required this.name,
@@ -14,7 +15,8 @@ class Plant {
     this.description = "",
     this.cycles = 0,
     required this.createdAt,
-    this.watered
+    this.watered,
+    this.picture
   });
 
   factory Plant.fromJson(Map<String, dynamic> json) =>
@@ -24,7 +26,8 @@ class Plant {
           description: json["description"],
           cycles: json["intensity"],
           createdAt: json["createdAt"],
-          watered: json["watered"]
+          watered: json["watered"],
+          picture: json["picture"]
       );
 
   Map<String, dynamic> toJson() =>
@@ -34,6 +37,7 @@ class Plant {
         "description": description,
         "intensity": cycles,
         "createdAt": createdAt,
-        "watered": watered
+        "watered": watered,
+        "picture": picture
       };
 }

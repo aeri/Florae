@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:florae/data/plant.dart';
 import 'package:florae/data/plant_repository.dart';
@@ -7,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 import 'package:get_it/get_it.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sembast/timestamp.dart';
 import 'package:intl/intl.dart';
 
@@ -36,19 +38,40 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
   XFile? _image;
 
+  int _prefNumber = 1;
+
   Future getImageFromCam() async {
-    var image = await _picker.pickImage(source: ImageSource.camera);
+    var image = await _picker.pickImage(source: ImageSource.camera,
+        imageQuality: 25);
     setState(() {
       _image = image;
     });
   }
 
   Future getImageFromGallery() async {
-    var image = await _picker.pickImage(source: ImageSource.gallery);
+    var image = await _picker.pickImage(source: ImageSource.gallery,
+        imageQuality: 25);
     setState(() {
       _image = image;
     });
   }
+
+  void getPrefabImage (){
+    if (_prefNumber < 8){
+      setState(() {
+        _image = null;
+        _prefNumber++;
+      });
+  }
+    else{
+      setState(() {
+        _image = null;
+        _prefNumber = 1;
+      });  }
+
+}
+
+
 
   void _showIntegerDialog() async {
     await showDialog<int>(
@@ -108,7 +131,11 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       ),
       //passing in the ListView.builder
       body: SingleChildScrollView(
-        child: Column(
+        child:
+        Padding (
+          padding: const EdgeInsets.all(15.0),
+          child:
+          Column(
           children: <Widget>[
             Card(
               clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -116,42 +143,42 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               elevation: 2,
-              margin: EdgeInsets.all(10),
-              child: Container(
-                  width: 370,
+              child: SizedBox(
                   child: Column(
                     children: <Widget>[
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20.0), //or 15.0
                         child: Container(
                           height: 200,
-                          color: Color(0xffFF0E58),
                           child: _image == null
                               ? Image.asset(
-                                  'assets/card-sample-image.jpg',
+                                  "assets/florae_avatar (${_prefNumber}).png",
                                   // TODO: Adjust the box size (102)
                                   fit: BoxFit.fitWidth,
                                 )
                               : Image.file(File(_image!.path)),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          FloatingActionButton(
-                            heroTag: "pic_cam",
-                            onPressed: getImageFromCam,
-                            tooltip: "Get image from camera",
-                            child: Icon(Icons.add_a_photo),
+                          IconButton(
+                              onPressed: getImageFromCam,
+                              icon: Icon(Icons.add_a_photo),
+                              tooltip: "Get image from camera",
                           ),
-                          FloatingActionButton(
-                            heroTag: "pick_gal",
+                          IconButton(
+                            onPressed: getPrefabImage,
+                            icon: Icon(Icons.refresh),
+                            tooltip: "Next default image",
+                          ),
+                          IconButton(
                             onPressed: getImageFromGallery,
-                            tooltip: "Get image from gallert",
-                            child: Icon(Icons.wallpaper),
-                          ),
+                            icon: Icon(Icons.wallpaper),
+                            tooltip: "Get image from gallery",
+                          )
                         ],
                       ),
                       SizedBox(height: 10),
@@ -165,7 +192,6 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               elevation: 2,
-              margin: EdgeInsets.all(10),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Form(
@@ -184,7 +210,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                       },
                       cursorColor: Colors.teal,
                       maxLength: 20,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         icon: Icon(Icons.local_florist),
                         labelText: 'Name',
                         labelStyle: TextStyle(
@@ -208,7 +234,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                       controller: descriptionController,
                       cursorColor: Colors.teal,
                       maxLength: 100,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         icon: Icon(Icons.topic),
                         labelText: 'Description',
                         labelStyle: TextStyle(
@@ -226,7 +252,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                       controller: locationController,
                       cursorColor: Colors.teal,
                       maxLength: 20,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         icon: Icon(Icons.location_on),
                         labelText: 'Location',
                         labelStyle: TextStyle(
@@ -252,57 +278,63 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
               ),
-              child: Container(
-                width: 370,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(children: <Widget>[
-                    ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.opacity),
-                      title: const Text('Water every'),
-                      subtitle: Text(_currentIntValue.toString() + " days"),
-                      onTap: _showIntegerDialog,
-                    ),
-                    ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: Icon(Icons.today),
-                      title: Text('Day planted'),
-                      subtitle: Text(DateFormat.yMMMMEEEEd().format(_planted)),
-                      onTap: () async {
-                        DateTime? result = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate:
-                                DateTime.now().subtract(Duration(days: 1000)),
-                            lastDate: DateTime.now());
-                        setState(() {
-                          _planted = result ?? DateTime.now();
-                        });
-                      },
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.group),
-                      title: Text('Contact group'),
-                      subtitle: Text('Not specified'),
-                    ),
-                  ]),
-                ),
-              ),
+              child: Column(children: <Widget>[
+                  ListTile(
+                    trailing: const Icon(Icons.arrow_right),
+                    leading: const Icon(Icons.opacity),
+                    title: const Text('Water every'),
+                    subtitle: Text(_currentIntValue.toString() + " days"),
+                    onTap: _showIntegerDialog,
+                  ),
+                  ListTile(
+                    trailing: const Icon(Icons.arrow_right),
+                    leading: Icon(Icons.today),
+                    title: Text('Day planted'),
+                    subtitle: Text(DateFormat.yMMMMEEEEd().format(_planted)),
+                    onTap: () async {
+                      DateTime? result = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate:
+                              DateTime.now().subtract(Duration(days: 1000)),
+                          lastDate: DateTime.now());
+                      setState(() {
+                        _planted = result ?? DateTime.now();
+                      });
+                    },
+                  ),
+                  /*
+                  const ListTile(
+                    leading: Icon(Icons.group),
+                    title: Text('Contact group'),
+                    subtitle: Text('Not specified'),
+                  ),
+                   */
+                ]),
             ),
-            SizedBox(height: 70),
+            const SizedBox(height: 70),
 
           ],
         ),
       ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
+          String fileName ="";
           if (_formKey.currentState!.validate()) {
+            if (_image!= null){
+              final Directory directory = await getApplicationDocumentsDirectory();
+              fileName = directory.path + "/" + generateRandomString(10);
+              _image!.saveTo(fileName);
+
+            }
             final newPlant = Plant(
                 name: nameController.text,
                 cycles: _currentIntValue,
                 createdAt: Timestamp.now(),
+                watered: Timestamp.fromDateTime(DateTime.now().subtract(const Duration(minutes: 5))),
                 description: descriptionController.text,
+                picture: _image != null ? fileName : "assets/florae_avatar (${_prefNumber}).png",
                 location: locationController.text);
             final plant = await _plantRepository.insertPlant(newPlant);
             print(plant);
@@ -315,6 +347,12 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       ),
     );
   }
+
+  String generateRandomString(int len) {
+    var r = Random();
+    return String.fromCharCodes(List.generate(len, (index) => r.nextInt(33) + 89));
+  }
+
 
   _loadPlants() async {
     final plants = await _plantRepository.getAllPlants();

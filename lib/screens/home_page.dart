@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:florae/data/plant_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:florae/data/plant.dart';
+import 'package:intl/intl.dart';
+import 'package:sembast/timestamp.dart';
 import 'manage_plant.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -26,7 +30,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final PlantRepository _plantRepository = GetIt.I.get();
   List<Plant> _plants = [];
-  List<Plant> _plantsFiltered = [];
+  bool _dateFilterEnabled = false;
+  DateTime _dateFilter = DateTime.now();
   int _selectedIndex = 0;
 
   @override
@@ -37,42 +42,94 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
+      _dateFilterEnabled = false;
       _selectedIndex = index;
+      _loadPlants();
     });
+  }
+
+  Future<void> _showWaterAllPlantsDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Have you watered all the plants?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(
+                    'This action will mark all plants as watered for today cycle.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                _waterAllPlants();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget noPlants() {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SvgPicture.asset(
-            _selectedIndex == 0
-                ? "assets/undraw_fall_thyk.svg"
-                : "assets/undraw_gardening_re_e658.svg",
-            semanticsLabel: 'Fall',
-            alignment: Alignment.center,
-            height: 250,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Text(
-            _selectedIndex == 0
-                ? 'Yay! You don\'t have any pending plants to water!'
-                : 'The garden is empty, what if you plant something?',
-            style: const TextStyle(
-              fontFamily: 'NotoSans',
-              fontWeight: FontWeight.w600,
-              fontSize: 25,
-              color: Color(0x78000000),
-              height: 1.4285714285714286,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(
+              _selectedIndex == 0
+                  ? "assets/undraw_fall_thyk.svg"
+                  : "assets/undraw_gardening_re_e658.svg",
+              semanticsLabel: 'Fall',
+              alignment: Alignment.center,
+              height: 250,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            const SizedBox(
+              height: 20,
+            ),
+            Text(
+              _selectedIndex == 0
+                  ? 'Yay! You don\'t have any pending plants to water!'
+                  : 'The garden is empty, shall we plant something?',
+              style: const TextStyle(
+                fontFamily: 'NotoSans',
+                fontWeight: FontWeight.w600,
+                fontSize: 25,
+                color: Color(0x78000000),
+                height: 1.4285714285714286,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  String titleSelector() {
+    if (_dateFilterEnabled) {
+      return DateFormat('EEEE').format(_dateFilter) +
+          " " +
+          DateFormat('d').format(_dateFilter);
+    } else if (_selectedIndex == 1) {
+      return "Garden";
+    } else {
+      return "Today";
+    }
   }
 
   @override
@@ -84,26 +141,51 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(_selectedIndex == 0 ? "Today" : "Garden"),
+        title: FittedBox(fit: BoxFit.fitWidth, child: Text(titleSelector())),
         titleTextStyle: const TextStyle(
             color: Colors.black54,
             fontSize: 40,
             fontWeight: FontWeight.w800,
             fontFamily: "NotoSans"),
         actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.calendar_today),
-            iconSize: 25,
-            color: Colors.black54,
-            tooltip: 'Show Calendar',
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('This is a snackbar')));
-            },
-          ),
+          _selectedIndex == 0
+              ? IconButton(
+                  icon: const Icon(Icons.assignment_turned_in),
+                  iconSize: 25,
+                  color: Colors.black54,
+                  tooltip: 'Water all plants',
+                  onPressed: () {
+                    _showWaterAllPlantsDialog();
+                  },
+                )
+              : const SizedBox.shrink(),
+          _selectedIndex == 0
+              ? IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  iconSize: 25,
+                  color: Colors.black54,
+                  tooltip: 'Show Calendar',
+                  onPressed: () async {
+                    DateTime? result = await showDatePicker(
+                        context: context,
+                        initialDate:
+                            DateTime.now().add(const Duration(days: 1)),
+                        firstDate: DateTime.now().add(const Duration(days: 1)),
+                        lastDate: DateTime.now().add(const Duration(days: 7)));
+                    setState(() {
+                      if (result != null) {
+                        _dateFilter = result;
+                        _dateFilterEnabled = true;
+                        _loadPlants();
+                      }
+                    });
+                  },
+                )
+              : const SizedBox.shrink(),
           IconButton(
             icon: const Icon(Icons.settings),
             iconSize: 25,
@@ -116,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0.0,
       ),
-      body: _plants.length == 0
+      body: _plants.isEmpty
           ? noPlants()
           : GridView.count(
               crossAxisCount: 2,
@@ -161,8 +243,44 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _loadPlants() async {
-    final plants = await _plantRepository.getAllPlants();
+    List<Plant> plants = [];
+    List<Plant> allPlants = await _plantRepository.getAllPlants();
+    Timestamp dateCheck = _dateFilterEnabled
+        ? Timestamp.fromDateTime(_dateFilter)
+        : Timestamp.now();
+
+    if (_selectedIndex == 0) {
+      for (Plant p in allPlants) {
+        var cpsr = (dateCheck.compareTo(p.watered!) / 60 / 60 / 24).round();
+        if (cpsr != 0 && cpsr % p.cycles == 0) {
+          plants.add(p);
+        }
+      }
+    } else {
+      plants = allPlants;
+    }
+
     setState(() => _plants = plants);
+  }
+
+  _waterAllPlants() async {
+    List<Plant> allPlants = await _plantRepository.getAllPlants();
+    Timestamp dateCheck = _dateFilterEnabled
+        ? Timestamp.fromDateTime(_dateFilter)
+        : Timestamp.now();
+
+    for (Plant p in allPlants) {
+      var cpsr = (dateCheck.compareTo(p.watered!) / 60 / 60 / 24).round();
+
+      if (cpsr >= p.cycles) {
+        p.watered = Timestamp.fromDateTime(DateTime.now().subtract(const Duration(minutes: 5)));
+        await _plantRepository.updatePlant(p);
+      }
+    }
+    setState(() {
+      _dateFilterEnabled = false;
+      _loadPlants();
+    });
   }
 
   _deletePlant(Plant plant) async {
@@ -201,11 +319,17 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 AspectRatio(
                   aspectRatio: 18 / 11,
-                  child: Image.asset(
-                    'assets/card-sample-image.jpg',
-                    // TODO: Adjust the box size (102)
-                    fit: BoxFit.fitWidth,
-                  ),
+                  child: plant.picture!.contains("assets/")
+                      ? Image.asset(
+                          plant.picture!,
+                          // TODO: Adjust the box size (102)
+                          fit: BoxFit.fitWidth,
+                        )
+                      : Image.file(
+                          File(plant.picture!),
+                          // TODO: Adjust the box size (102)
+                          fit: BoxFit.fitWidth,
+                        ),
                 ),
                 Expanded(
                   child: Padding(

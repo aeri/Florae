@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   : 'The garden is empty, shall we plant something?',
               style: const TextStyle(
                 fontFamily: 'NotoSans',
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 fontSize: 25,
                 color: Color(0x78000000),
                 height: 1.4285714285714286,
@@ -154,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           _selectedIndex == 0
               ? IconButton(
-                  icon: const Icon(Icons.assignment_turned_in),
+                  icon: const Icon(Icons.checklist_rounded),
                   iconSize: 25,
                   color: Colors.black54,
                   tooltip: 'Water all plants',
@@ -232,6 +232,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     const ManagePlantScreen(title: "Manage plant"),
               ));
           setState(() {
+            _selectedIndex = 1;
             _loadPlants();
           });
         },
@@ -251,8 +252,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (_selectedIndex == 0) {
       for (Plant p in allPlants) {
-        var cpsr = (dateCheck.compareTo(p.watered!) / 60 / 60 / 24).round();
-        if (cpsr != 0 && cpsr % p.cycles == 0) {
+        var cpsr = (dateCheck.compareTo(p.cares["water"]!.effected!) / 60 / 60 / 24).round();
+        if (cpsr != 0 && cpsr % p.cares["water"]!.cycles == 0) {
           plants.add(p);
         }
       }
@@ -270,10 +271,11 @@ class _MyHomePageState extends State<MyHomePage> {
         : Timestamp.now();
 
     for (Plant p in allPlants) {
-      var cpsr = (dateCheck.compareTo(p.watered!) / 60 / 60 / 24).round();
+      var cpsr = (dateCheck.compareTo(p.cares["water"]!.effected!) / 60 / 60 / 24).round();
 
-      if (cpsr >= p.cycles) {
-        p.watered = Timestamp.fromDateTime(DateTime.now().subtract(const Duration(minutes: 5)));
+      if (cpsr >= p.cares["water"]!.cycles) {
+        p.cares["water"]!.effected = Timestamp.fromDateTime(
+            DateTime.now().subtract(const Duration(minutes: 5)));
         await _plantRepository.updatePlant(p);
       }
     }

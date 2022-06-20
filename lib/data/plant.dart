@@ -1,22 +1,40 @@
 import 'package:sembast/timestamp.dart';
 
+class Care {
+  int cycles = 0;
+  Timestamp? effected;
+
+  Care({required this.cycles, required this.effected});
+
+  factory Care.fromJson(Map<String, dynamic> json) =>
+      Care(
+          cycles: json["cycles"],
+          effected: json["effected"]
+      );
+
+  Map<String, dynamic> toJson() =>
+      {
+        "cycles": cycles,
+        "effected": effected
+      };
+
+}
+
 class Plant {
   String name;
   String? location;
   String description;
-  int cycles;
   Timestamp createdAt;
-  Timestamp? watered;
   String? picture;
+  Map <String, Care> cares;
 
   Plant({
     required this.name,
     this.location,
     this.description = "",
-    this.cycles = 0,
     required this.createdAt,
-    this.watered,
-    this.picture
+    this.picture,
+    required this.cares
   });
 
   factory Plant.fromJson(Map<String, dynamic> json) =>
@@ -24,10 +42,9 @@ class Plant {
           name: json["name"],
           location: json["location"],
           description: json["description"],
-          cycles: json["intensity"],
           createdAt: json["createdAt"],
-          watered: json["watered"],
-          picture: json["picture"]
+          picture: json["picture"],
+          cares: json["cares"]
       );
 
   Map<String, dynamic> toJson() =>
@@ -35,9 +52,8 @@ class Plant {
         "name": name,
         "location": location,
         "description": description,
-        "intensity": cycles,
         "createdAt": createdAt,
-        "watered": watered,
-        "picture": picture
+        "picture": picture,
+        "cares": cares
       };
 }

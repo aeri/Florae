@@ -42,7 +42,6 @@ dependencies:
   numberpicker: ^2.0.1
   flutter_svg: ^1.0.3
   intl: ^0.17.0
-  android_alarm_manager_plus: ^2.0.5
   flutter_local_notifications: ^9.3.2
 dev_dependencies:
   build_runner: ^2.0.0

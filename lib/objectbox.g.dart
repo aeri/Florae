@@ -19,28 +19,28 @@ export 'package:objectbox/objectbox.dart'; // so that callers only have to impor
 
 final _entities = <ModelEntity>[
   ModelEntity(
-      id: const IdUid(1, 722516892698402163),
+      id: const IdUid(1, 6017369575698615271),
       name: 'Care',
-      lastPropertyId: const IdUid(4, 2206010046325032357),
+      lastPropertyId: const IdUid(4, 9170897634876619206),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
-            id: const IdUid(1, 7445562970601710227),
+            id: const IdUid(1, 8647452937344853257),
             name: 'id',
             type: 6,
             flags: 1),
         ModelProperty(
-            id: const IdUid(2, 3377155211690682605),
+            id: const IdUid(2, 9035521047735137659),
             name: 'name',
             type: 9,
             flags: 0),
         ModelProperty(
-            id: const IdUid(3, 4045402009443379560),
+            id: const IdUid(3, 40688042087648428),
             name: 'cycles',
             type: 6,
             flags: 0),
         ModelProperty(
-            id: const IdUid(4, 2206010046325032357),
+            id: const IdUid(4, 9170897634876619206),
             name: 'effected',
             type: 10,
             flags: 0)
@@ -48,47 +48,47 @@ final _entities = <ModelEntity>[
       relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[]),
   ModelEntity(
-      id: const IdUid(2, 6735630318349479657),
+      id: const IdUid(2, 8248999037139681305),
       name: 'Plant',
-      lastPropertyId: const IdUid(6, 5280041976840191288),
+      lastPropertyId: const IdUid(6, 8156462471304383266),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
-            id: const IdUid(1, 3508636658419930671),
+            id: const IdUid(1, 663235456190999336),
             name: 'id',
             type: 6,
             flags: 1),
         ModelProperty(
-            id: const IdUid(2, 4759872304919524697),
+            id: const IdUid(2, 7653806020704880625),
             name: 'name',
             type: 9,
             flags: 0),
         ModelProperty(
-            id: const IdUid(3, 7052533686421030117),
+            id: const IdUid(3, 4563435691994880788),
             name: 'location',
             type: 9,
             flags: 0),
         ModelProperty(
-            id: const IdUid(4, 6805687149218974511),
+            id: const IdUid(4, 370151171891422499),
             name: 'description',
             type: 9,
             flags: 0),
         ModelProperty(
-            id: const IdUid(5, 5910431987410315215),
+            id: const IdUid(5, 8736961919321289742),
             name: 'createdAt',
             type: 10,
             flags: 0),
         ModelProperty(
-            id: const IdUid(6, 5280041976840191288),
+            id: const IdUid(6, 8156462471304383266),
             name: 'picture',
             type: 9,
             flags: 0)
       ],
       relations: <ModelRelation>[
         ModelRelation(
-            id: const IdUid(1, 6285231109730975963),
+            id: const IdUid(1, 4325392459038757092),
             name: 'cares',
-            targetId: const IdUid(1, 722516892698402163))
+            targetId: const IdUid(1, 6017369575698615271))
       ],
       backlinks: <ModelBacklink>[])
 ];
@@ -113,9 +113,9 @@ Future<Store> openStore(
 ModelDefinition getObjectBoxModel() {
   final model = ModelInfo(
       entities: _entities,
-      lastEntityId: const IdUid(2, 6735630318349479657),
+      lastEntityId: const IdUid(2, 8248999037139681305),
       lastIndexId: const IdUid(0, 0),
-      lastRelationId: const IdUid(1, 6285231109730975963),
+      lastRelationId: const IdUid(1, 4325392459038757092),
       lastSequenceId: const IdUid(0, 0),
       retiredEntityUids: const [],
       retiredIndexUids: const [],

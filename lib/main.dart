@@ -9,6 +9,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   objectbox = await ObjectBox.create();
+  
 
   runApp(FloraeApp());
 }
@@ -34,19 +35,7 @@ class FloraeApp extends StatelessWidget {
           primarySwatch: Colors.teal,
           fontFamily: "NotoSans",
           scaffoldBackgroundColor: Colors.grey[100]),
-      home: FutureBuilder(
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return const MyHomePage(title: 'Today');
-          } else {
-            return Material(
-              child: Center(
-                child: CircularProgressIndicator(color: Colors.teal),
-              ),
-            );
-          }
-        },
-      ),
+      home:  const MyHomePage(title: 'Today')
     );
   }
 }

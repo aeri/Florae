@@ -2,12 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get_it/get_it.dart';
 import 'package:florae/data/plant.dart';
 import 'package:intl/intl.dart';
 import '../main.dart';
 import 'manage_plant.dart';
-import '../data/box.dart';
 
 
 class MyHomePage extends StatefulWidget {
@@ -255,7 +253,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_selectedIndex == 0) {
       for (Plant p in allPlants) {
         for (Care c in p.cares){
-          var cpsr = (dateCheck.compareTo(c.effected!) / 60 / 60 / 24).round();
+          print((dateCheck.difference(c.effected!).inSeconds)/ 60 / 60 / 24);
+          var cpsr = dateCheck.difference(c.effected!).inDays;
           if (cpsr != 0 && cpsr % c.cycles == 0) {
             plants.add(p);
           }
@@ -295,7 +294,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _deletePlant(Plant plant) async {
+
+    /*
+    for (var care in plant.cares) {
+      objectbox.careBox.remove(care.id);
+    }
+
     objectbox.plantBox.remove(plant.id);
+    */
+
+    await objectbox.removePlant(plant);
     _loadPlants();
   }
 

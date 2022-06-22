@@ -9,8 +9,11 @@ class ObjectBox {
   /// A Box of notes.
   late final Box<Plant> plantBox;
 
+  late final Box<Care> careBox;
+
   ObjectBox._create(this.store) {
     plantBox = Box<Plant>(store);
+    careBox = Box<Care>(store);
     // Add any additional setup code, e.g. build queries.
   }
 
@@ -23,6 +26,20 @@ class ObjectBox {
 
   int addPlant(Plant plant) =>
       store.box<Plant>().put(plant);
+
+  Future<void> removePlant(Plant plant) =>
+      store.runInTransactionAsync(TxMode.write, _removePlantInTx, plant.id);
+
+  /// Note: due to [dart-lang/sdk#36983](https://github.com/dart-lang/sdk/issues/36983)
+  /// not using a closure as it may capture more objects than expected.
+  /// These might not be send-able to an isolate. See Store.runAsync for details.
+  static void _removePlantInTx(Store store, int id) {
+    // Perform ObjectBox operations that take longer than a few milliseconds
+    // here. To keep it simple, this example just puts a single object.
+
+    store.box<Plant>().remove(id);
+
+  }
 
 
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:florae/data/plant.dart';
+import 'package:florae/main.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
@@ -128,6 +129,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text('New plant'),
+        elevation: 0.0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
         titleTextStyle: const TextStyle(
@@ -339,7 +341,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                       }),
                   ListTile(
                       trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.published_with_changes,
+                      leading: const Icon(Icons.compost,
                           color: Colors.green),
                       title: const Text('Transplant every'),
                       subtitle: cares["transplant"]!.cycles != 0
@@ -402,6 +404,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               fileName = directory.path + "/" + generateRandomString(10);
               _image!.saveTo(fileName);
             }
+
+
             final newPlant = Plant(
                 name: nameController.text,
                 createdAt: DateTime.now(),
@@ -410,8 +414,15 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     ? fileName
                     : "assets/florae_avatar (${_prefNumber}).png",
                 location: locationController.text);
-            final plant = await _plantRepository.insertPlant(newPlant);
-            print(plant);
+
+            cares.forEach((key, value) {
+              if (value.cycles != 0){
+                newPlant.cares.add(Care(cycles: value.cycles, effected: value.effected, name: key));
+              }
+            });
+
+            objectbox.plantBox.put(newPlant);
+            print(newPlant);
             Navigator.pop(context);
           }
         },
@@ -429,8 +440,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   }
 
   _loadPlants() async {
-    final plants = await _plantRepository.getAllPlants();
-    setState(() => _plants = plants);
+    List<Plant> allPlants = objectbox.plantBox.getAll();
+    setState(() => _plants = allPlants);
   }
 
   Plant? findPlant(String name) => _plants

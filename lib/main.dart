@@ -1,16 +1,19 @@
-import 'dart:isolate';
 import 'package:flutter/material.dart';
-import 'data/app_databse.dart';
+import 'data/box.dart';
 import 'screens/home_page.dart';
+
+
+late ObjectBox objectbox;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  objectbox = await ObjectBox.create();
 
   runApp(FloraeApp());
 }
 
 class FloraeApp extends StatelessWidget {
-  final Future _init = Init.initialize();
 
   // This widget is the root of your application.
   @override
@@ -32,7 +35,6 @@ class FloraeApp extends StatelessWidget {
           fontFamily: "NotoSans",
           scaffoldBackgroundColor: Colors.grey[100]),
       home: FutureBuilder(
-        future: _init,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return const MyHomePage(title: 'Today');

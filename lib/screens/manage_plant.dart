@@ -2,14 +2,11 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:florae/data/plant.dart';
-import 'package:florae/data/plant_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
 
-import 'package:get_it/get_it.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sembast/timestamp.dart';
 import 'package:intl/intl.dart';
 
 class ManagePlantScreen extends StatefulWidget {
@@ -25,7 +22,6 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   Map<String, Care> cares = {};
 
   DateTime _planted = DateTime.now();
-  final PlantRepository _plantRepository = GetIt.I.get();
 
   List<Plant> _plants = [];
 
@@ -108,15 +104,17 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     super.initState();
     _loadPlants();
 
-    Timestamp init = Timestamp.fromDateTime(
-        DateTime.now().subtract(const Duration(minutes: 5)));
-    cares["water"] = Care(cycles: 1, effected: init);
-    cares["rotate"] = Care(cycles: 0, effected: init);
-    cares["spray"] = Care(cycles: 0, effected: init);
-    cares["prune"] = Care(cycles: 0, effected: init);
-    cares["fertilise"] = Care(cycles: 0, effected: init);
-    cares["transplant"] = Care(cycles: 0, effected: init);
-    cares["clean"] = Care(cycles: 0, effected: init);
+
+
+    cares["water"] = Care(cycles: 1, effected: DateTime.now(), name: "water");
+    cares["rotate"] = Care(cycles: 0, effected:  DateTime.now(), name: "rotate");
+    cares["spray"] = Care(cycles: 0, effected:  DateTime.now(), name: "spray");
+    cares["prune"] = Care(cycles: 0, effected:  DateTime.now(), name: "prune");
+    cares["fertilise"] = Care(cycles: 0, effected:  DateTime.now(), name: "fertilise");
+    cares["transplant"] = Care(cycles: 0, effected:  DateTime.now(), name: "transplant");
+    cares["clean"] = Care(cycles: 0, effected:  DateTime.now(), name: "clean");
+
+
   }
 
   @override
@@ -406,8 +404,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
             }
             final newPlant = Plant(
                 name: nameController.text,
-                cares: cares,
-                createdAt: Timestamp.now(),
+                createdAt: DateTime.now(),
                 description: descriptionController.text,
                 picture: _image != null
                     ? fileName

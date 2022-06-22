@@ -1,41 +1,50 @@
-import 'package:sembast/timestamp.dart';
 
+import 'package:objectbox/objectbox.dart';
+
+@Entity()
 class Care {
+  int id = 0;
+  String name;
   int cycles = 0;
-  Timestamp? effected;
+  @Property(type: PropertyType.date)
+  DateTime? effected;
 
-  Care({required this.cycles, required this.effected});
+  Care({required this.name, required this.cycles, required this.effected});
 
   factory Care.fromJson(Map<String, dynamic> json) =>
       Care(
           cycles: json["cycles"],
-          effected: json["effected"]
+          effected: json["effected"],
+          name: json["name"]
       );
 
   Map<String, dynamic> toJson() =>
       {
         "cycles": cycles,
-        "effected": effected
+        "effected": effected,
+        "name": name
       };
 
 }
 
+@Entity()
 class Plant {
+  int id = 0;
   String name;
   String? location;
   String description;
-  Timestamp createdAt;
+  @Property(type: PropertyType.date)
+  DateTime createdAt;
   String? picture;
-  Map <String, Care> cares;
+
+  final cares = ToMany<Care>();
 
   Plant({
     required this.name,
     this.location,
     this.description = "",
     required this.createdAt,
-    this.picture,
-    required this.cares
-  });
+    this.picture});
 
   factory Plant.fromJson(Map<String, dynamic> json) =>
       Plant(
@@ -44,7 +53,6 @@ class Plant {
           description: json["description"],
           createdAt: json["createdAt"],
           picture: json["picture"],
-          cares: json["cares"]
       );
 
   Map<String, dynamic> toJson() =>
@@ -54,6 +62,5 @@ class Plant {
         "description": description,
         "createdAt": createdAt,
         "picture": picture,
-        "cares": cares
       };
 }

@@ -1,13 +1,14 @@
 import 'dart:io';
 
-import 'package:florae/data/plant_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:florae/data/plant.dart';
 import 'package:intl/intl.dart';
-import 'package:sembast/timestamp.dart';
+import '../main.dart';
 import 'manage_plant.dart';
+import '../data/box.dart';
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -28,7 +29,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final PlantRepository _plantRepository = GetIt.I.get();
   List<Plant> _plants = [];
   bool _dateFilterEnabled = false;
   DateTime _dateFilter = DateTime.now();
@@ -73,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
             TextButton(
               child: const Text('Yes'),
               onPressed: () {
-                _waterAllPlants();
+                _careAllPlants();
                 Navigator.of(context).pop();
               },
             ),
@@ -244,17 +244,21 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _loadPlants() async {
+
     List<Plant> plants = [];
-    List<Plant> allPlants = await _plantRepository.getAllPlants();
-    Timestamp dateCheck = _dateFilterEnabled
-        ? Timestamp.fromDateTime(_dateFilter)
-        : Timestamp.now();
+    List<Plant> allPlants = objectbox.plantBox.getAll();
+
+    DateTime dateCheck = _dateFilterEnabled
+        ? _dateFilter
+        : DateTime.now();
 
     if (_selectedIndex == 0) {
       for (Plant p in allPlants) {
-        var cpsr = (dateCheck.compareTo(p.cares["water"]!.effected!) / 60 / 60 / 24).round();
-        if (cpsr != 0 && cpsr % p.cares["water"]!.cycles == 0) {
-          plants.add(p);
+        for (Care c in p.cares){
+          var cpsr = (dateCheck.compareTo(c.effected!) / 60 / 60 / 24).round();
+          if (cpsr != 0 && cpsr % c.cycles == 0) {
+            plants.add(p);
+          }
         }
       }
     } else {
@@ -264,21 +268,26 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() => _plants = plants);
   }
 
-  _waterAllPlants() async {
-    List<Plant> allPlants = await _plantRepository.getAllPlants();
-    Timestamp dateCheck = _dateFilterEnabled
-        ? Timestamp.fromDateTime(_dateFilter)
-        : Timestamp.now();
+  _careAllPlants() async {
+    List<Plant> allPlants = objectbox.plantBox.getAll();
+    DateTime dateCheck = _dateFilterEnabled
+        ? _dateFilter
+        : DateTime.now();
+
 
     for (Plant p in allPlants) {
-      var cpsr = (dateCheck.compareTo(p.cares["water"]!.effected!) / 60 / 60 / 24).round();
+      for (Care c in p.cares){
 
-      if (cpsr >= p.cares["water"]!.cycles) {
-        p.cares["water"]!.effected = Timestamp.fromDateTime(
-            DateTime.now().subtract(const Duration(minutes: 5)));
-        await _plantRepository.updatePlant(p);
+        var cpsr = (dateCheck.compareTo(c.effected!) / 60 / 60 / 24).round();
+
+        if (cpsr >= c.cycles) {
+          c.effected = DateTime.now();
+          //await _plantRepository.updatePlant(p);
+        }
+
       }
     }
+
     setState(() {
       _dateFilterEnabled = false;
       _loadPlants();
@@ -286,7 +295,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _deletePlant(Plant plant) async {
-    await _plantRepository.deletePlant(plant.name);
+    objectbox.plantBox.remove(plant.id);
     _loadPlants();
   }
 

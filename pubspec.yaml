@@ -36,13 +36,16 @@ dependencies:
   cupertino_icons: ^1.0.2
   objectbox: ^1.5.0
   objectbox_flutter_libs: any
-  path_provider: ^2.0.9
-  get_it: ^7.2.0
-  image_picker: ^0.8.4+9
-  numberpicker: ^2.0.1
-  flutter_svg: ^1.0.3
+  path_provider: ^2.0.11
+  image_picker: ^0.8.5+3
+  numberpicker: ^2.1.1
+  flutter_svg: ^1.1.0
   intl: ^0.17.0
-  flutter_local_notifications: ^9.3.2
+  background_fetch: ^1.1.0
+  flutter_local_notifications: ^9.6.1
+  shared_preferences: ^2.0.15
+
+
 dev_dependencies:
   build_runner: ^2.0.0
   objectbox_generator: any

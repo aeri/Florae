@@ -1,6 +1,10 @@
+import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'data/box.dart';
+import 'data/plant.dart';
 import 'screens/home_page.dart';
+import 'package:florae/notifications.dart' as notify;
+
 
 
 late ObjectBox objectbox;
@@ -9,9 +13,62 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   objectbox = await ObjectBox.create();
-  
+  print ("florae: ENTERING MAIN");
+  notify.initNotifications();
 
   runApp(FloraeApp());
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+
+}
+
+void backgroundFetchHeadlessTask(HeadlessTask task) async {
+  String taskId = task.taskId;
+  bool isTimeout = task.timeout;
+  if (isTimeout) {
+    // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
+    print("[BackgroundFetch] Headless task timed-out: $taskId");
+    BackgroundFetch.finish(taskId);
+    return;
+  }
+
+  print("[BackgroundFetch] Headless event received: $taskId");
+/*
+
+  ObjectBox obx = await ObjectBox.create();
+
+
+  List<Plant> allPlants = obx.plantBox.getAll();
+  List<String> plants = [];
+
+
+  for (Plant p in allPlants) {
+    for (Care c in p.cares){
+      var cpsr = DateTime.now().difference(c.effected!).inDays;
+      if (cpsr != 0 && cpsr % c.cycles == 0) {
+        plants.add(p.name);
+      }
+      break;
+    }
+  }
+
+  print (plants.join(' '));
+
+
+ */
+
+  notify.singleNotification("Florae", "Headless notification", 7);
+
+
+  /*
+  if (plants.isNotEmpty){
+    notify.singleNotification("Plants require care", plants.join(' '), 7);
+  }
+  obx.store.close();
+
+  */
+  print("[BackgroundFetch] Headless event finished: $taskId");
+
+  BackgroundFetch.finish(taskId);
 }
 
 class FloraeApp extends StatelessWidget {

@@ -4,6 +4,11 @@ buildscript {
         google()
         mavenCentral()
     }
+    ext {
+        compileSdkVersion   = 31                // or latest
+        targetSdkVersion    = 31                // or latest
+        appCompatVersion    = "1.4.2"           // or latest
+    }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.0'

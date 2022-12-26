@@ -105,8 +105,6 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     super.initState();
     _loadPlants();
 
-
-
     cares["water"] = Care(cycles: 1, effected: DateTime.now(), name: "water");
     cares["rotate"] = Care(cycles: 0, effected:  DateTime.now(), name: "rotate");
     cares["spray"] = Care(cycles: 0, effected:  DateTime.now(), name: "spray");
@@ -114,7 +112,6 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     cares["fertilise"] = Care(cycles: 0, effected:  DateTime.now(), name: "fertilise");
     cares["transplant"] = Care(cycles: 0, effected:  DateTime.now(), name: "transplant");
     cares["clean"] = Care(cycles: 0, effected:  DateTime.now(), name: "clean");
-
 
   }
 

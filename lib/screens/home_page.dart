@@ -7,11 +7,10 @@ import 'package:florae/data/plant.dart';
 import 'package:florae/notifications.dart' as notify;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 import 'package:intl/intl.dart';
 import '../main.dart';
 import 'manage_plant.dart';
-
+import 'settings.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -50,42 +49,45 @@ class _MyHomePageState extends State<MyHomePage> {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     // Configure BackgroundFetch.
+    try {
+      var status = await BackgroundFetch.configure(
+          BackgroundFetchConfig(
+              minimumFetchInterval: 15,
+              forceAlarmManager: false,
+              stopOnTerminate: false,
+              startOnBoot: true,
+              enableHeadless: true,
+              requiresBatteryNotLow: false,
+              requiresCharging: false,
+              requiresStorageNotLow: false,
+              requiresDeviceIdle: false,
+              requiredNetworkType: NetworkType.NONE),
+          _onBackgroundFetch,
+          _onBackgroundFetchTimeout);
+      print('[BackgroundFetch] configure success: $status');
+      setState(() {
+        _status = status;
+      });
+    } on Exception catch (e) {
+      print("[BackgroundFetch] configure ERROR: $e");
+    }
 
-    final prefs = await SharedPreferences.getInstance();
-    final bool? configured = prefs.getBool('configured');
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+  }
 
-    if (configured == null || configured == false) {
-/*
-      BackgroundFetch.scheduleTask(TaskConfig(
-          taskId: "com.transistorsoft.gfFetchDataTask",
-          delay: 5*60*1000,
-          forceAlarmManager: true,
-          periodic: true,
-          stopOnTerminate: false,
-          startOnBoot: true,
-          enableHeadless: true
-      ));
-*/
-    int status = await BackgroundFetch.configure(BackgroundFetchConfig(
-        minimumFetchInterval: 15,
-        stopOnTerminate: false,
-        enableHeadless: true,
-        requiresBatteryNotLow: false,
-        requiresCharging: false,
-        startOnBoot: true,
-        requiresStorageNotLow: false,
-        requiresDeviceIdle: false,
-        requiredNetworkType: NetworkType.NONE
-    ), (String taskId) async {  // <-- Event handler
-      // This is the fetch-event callback.
-      print("[BackgroundFetch] Event received $taskId");
-/*
+  void _onBackgroundFetch(String taskId) async {
+    // This is the fetch-event callback.
+    print("[BackgroundFetch] Event received: $taskId");
+
+    if (taskId == "flutter_background_fetch") {
       List<Plant> allPlants = objectbox.plantBox.getAll();
       List<String> plants = [];
 
-
       for (Plant p in allPlants) {
-        for (Care c in p.cares){
+        for (Care c in p.cares) {
           var cpsr = DateTime.now().difference(c.effected!).inDays;
           if (cpsr != 0 && cpsr % c.cycles == 0) {
             plants.add(p.name);
@@ -94,33 +96,22 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
 
-      notify.singleNotification("Plants require care", plants.join(' '), 7);
-*/
+      if (plants.isNotEmpty) {
+        notify.singleNotification("Plants require care", plants.join(' '), 7);
+      }
 
-      notify.singleNotification("Florae", "Foreground notification", 7);
+      //notify.singleNotification("Florae", "Foreground notification", 7);
 
-
-      // IMPORTANT:  You must signal completion of your task or the OS can punish your app
-      // for taking too long in the background.
-      print("[BackgroundFetch] Event closed $taskId");
-      BackgroundFetch.finish(taskId);
-    }, (String taskId) async {  // <-- Task timeout handler.
-      // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
-      print("[BackgroundFetch] TASK TIMEOUT taskId: $taskId");
-      BackgroundFetch.finish(taskId);
-    });
-    print('[BackgroundFetch] configure success: $status');
-    prefs.setBool('configured', true);
-    setState(() {
-      _status = status;
-    });
-
-
-      // If the widget was removed from the tree while the asynchronous platform
-      // message was in flight, we want to discard the reply rather than calling
-      // setState to update our non-existent appearance.
-      if (!mounted) return;
     }
+    // IMPORTANT:  You must signal completion of your fetch task or the OS can punish your app
+    // for taking too long in the background.
+    BackgroundFetch.finish(taskId);
+  }
+
+  /// This event fires shortly before your task is about to timeout.  You must finish any outstanding work and call BackgroundFetch.finish(taskId).
+  void _onBackgroundFetchTimeout(String taskId) {
+    print("[BackgroundFetch] TIMEOUT: $taskId");
+    BackgroundFetch.finish(taskId);
   }
 
   void _onItemTapped(int index) {
@@ -176,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
             SvgPicture.asset(
               _selectedIndex == 0
                   ? "assets/undraw_fall_thyk.svg"
-                  : "assets/undraw_gardening_re_e658.svg",
+                  : "assets/undraw_blooming_re_2kc4.svg",
               semanticsLabel: 'Fall',
               alignment: Alignment.center,
               height: 250,
@@ -186,7 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text(
               _selectedIndex == 0
-                  ? 'Yay! You don\'t have any pending plants to water!'
+                  ? 'Yay! You don\'t have any pending plants to water'
                   : 'The garden is empty, shall we plant something?',
               style: const TextStyle(
                 fontFamily: 'NotoSans',
@@ -273,7 +264,14 @@ class _MyHomePageState extends State<MyHomePage> {
             iconSize: 25,
             color: Colors.black54,
             tooltip: 'Settings',
-            onPressed: () async {},
+            onPressed: () async {
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (context) =>
+                        const SettingsScreen(title: "Settings Screen"),
+                  ));
+            },
           ),
         ],
         backgroundColor: Colors.transparent,
@@ -326,18 +324,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _loadPlants() async {
-
     List<Plant> plants = [];
     List<Plant> allPlants = objectbox.plantBox.getAll();
 
-    DateTime dateCheck = _dateFilterEnabled
-        ? _dateFilter
-        : DateTime.now();
+    DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
 
     if (_selectedIndex == 0) {
       for (Plant p in allPlants) {
-        for (Care c in p.cares){
-          print((dateCheck.difference(c.effected!).inSeconds)/ 60 / 60 / 24);
+        for (Care c in p.cares) {
+          print((dateCheck.difference(c.effected!).inSeconds) / 60 / 60 / 24);
           var cpsr = dateCheck.difference(c.effected!).inDays;
           if (cpsr != 0 && cpsr % c.cycles == 0) {
             plants.add(p);
@@ -353,21 +348,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _careAllPlants() async {
     List<Plant> allPlants = objectbox.plantBox.getAll();
-    DateTime dateCheck = _dateFilterEnabled
-        ? _dateFilter
-        : DateTime.now();
-
+    DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
 
     for (Plant p in allPlants) {
-      for (Care c in p.cares){
-
+      for (Care c in p.cares) {
         var cpsr = (dateCheck.compareTo(c.effected!) / 60 / 60 / 24).round();
 
         if (cpsr >= c.cycles) {
           c.effected = DateTime.now();
           //await _plantRepository.updatePlant(p);
         }
-
       }
     }
 
@@ -378,7 +368,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _deletePlant(Plant plant) async {
-
     /*
     for (var care in plant.cares) {
       objectbox.careBox.remove(care.id);
@@ -411,7 +400,6 @@ class _MyHomePageState extends State<MyHomePage> {
             _deletePlant(plant);
           },
           onLongPressCancel: () {
-            notify.singleNotification("Notify test", "Forced", 2);
             print(plant.name);
           },
           child: Card(

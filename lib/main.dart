@@ -17,22 +17,24 @@ Future<void> main() async {
   notify.initNotifications();
 
   runApp(FloraeApp());
+
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 
 }
 
+/// This "Headless Task" is run when app is terminated.
+@pragma('vm:entry-point')
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
-  String taskId = task.taskId;
-  bool isTimeout = task.timeout;
-  if (isTimeout) {
-    // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
+  var taskId = task.taskId;
+  var timeout = task.timeout;
+  if (timeout) {
     print("[BackgroundFetch] Headless task timed-out: $taskId");
     BackgroundFetch.finish(taskId);
     return;
   }
 
   print("[BackgroundFetch] Headless event received: $taskId");
-/*
+
 
   ObjectBox obx = await ObjectBox.create();
 
@@ -51,22 +53,22 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     }
   }
 
-  print (plants.join(' '));
+  print ("florae detected plants " + plants.join(' '));
+
+//  notify.singleNotification("Florae", "Headless notification", 7);
 
 
- */
-
-  notify.singleNotification("Florae", "Headless notification", 7);
-
-
-  /*
   if (plants.isNotEmpty){
     notify.singleNotification("Plants require care", plants.join(' '), 7);
   }
+  else{
+    print ("florae no plants require care");
+  }
   obx.store.close();
 
-  */
+
   print("[BackgroundFetch] Headless event finished: $taskId");
+
 
   BackgroundFetch.finish(taskId);
 }

@@ -91,8 +91,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 child: Column(children: <Widget>[
                   ListTile(
                       trailing: const Icon(Icons.arrow_right),
-                      leading:
-                          const Icon(Icons.alarm, color: Colors.blue),
+                      leading: const Icon(Icons.alarm, color: Colors.blue),
                       title: const Text('Notify every'),
                       subtitle: periodityCheckInHours != 0
                           ? Text(periodityCheckInHours.toString() + " hours")
@@ -109,26 +108,6 @@ class _SettingsScreen extends State<SettingsScreen> {
                         notify.singleNotification("Florae Test Notification",
                             "This is a test message", 2);
                       }),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.text_snippet,
-                          color: Colors.lightGreen),
-                      title: const Text('About'),
-                      onTap: () {
-                        showAboutDialog(
-                          context: context,
-                          applicationIcon: FlutterLogo(),
-                          applicationName: 'Florae',
-                          applicationVersion: '1.0.0',
-                          applicationLegalese: '© Naval Alcalá',
-                          children: <Widget>[
-                            Padding(
-                                padding: EdgeInsets.only(top: 15),
-                                child:
-                                    Text('This is an about dialog in Flutter'))
-                          ],
-                        );
-                      }),
 
                   /*
                   const ListTile(
@@ -139,6 +118,28 @@ class _SettingsScreen extends State<SettingsScreen> {
                    */
                 ]),
               ),
+              Card(
+                  semanticContainer: true,
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Column(children: <Widget>[
+                    ListTile(
+                        trailing: const Icon(Icons.arrow_right),
+                        leading: const Icon(Icons.text_snippet,
+                            color: Colors.lightGreen),
+                        title: const Text('About Florae'),
+                        onTap: () {
+                          showAboutDialog(
+                            context: context,
+                            applicationName: 'Florae',
+                            applicationVersion: '1.0.0',
+                            applicationLegalese: '© Naval Alcalá',
+                          );
+                        }),
+                  ])),
               const SizedBox(height: 70),
             ],
           ),

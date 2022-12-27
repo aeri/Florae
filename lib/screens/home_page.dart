@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:florae/data/plant.dart';
 import 'package:florae/notifications.dart' as notify;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:intl/intl.dart';
+import '../data/default.dart';
+import '../data/default.dart';
 import '../main.dart';
 import 'manage_plant.dart';
+import 'care_plant.dart';
 import 'settings.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -32,6 +34,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Plant> _plants = [];
+  Map<String, List<String>> _cares = {};
   bool _dateFilterEnabled = false;
   DateTime _dateFilter = DateTime.now();
   int _selectedIndex = 0;
@@ -88,7 +91,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
       for (Plant p in allPlants) {
         for (Care c in p.cares) {
-          var cpsr = DateTime.now().difference(c.effected!).inDays;
+          var cpsr = DateTime
+              .now()
+              .difference(c.effected!)
+              .inDays;
           if (cpsr != 0 && cpsr % c.cycles == 0) {
             plants.add(p.name);
           }
@@ -128,12 +134,12 @@ class _MyHomePageState extends State<MyHomePage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Have you watered all the plants?'),
+          title: const Text('Have you taken care of all the plants?'),
           content: SingleChildScrollView(
             child: ListBody(
               children: const <Widget>[
                 Text(
-                    'This action will mark all plants as watered for today cycle.'),
+                    'This action will mark all plants as cared for today cycle.'),
               ],
             ),
           ),
@@ -177,7 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text(
               _selectedIndex == 0
-                  ? 'Yay! You don\'t have any pending plants to water'
+                  ? 'Yay! You don\'t have any pending plants to care'
                   : 'The garden is empty, shall we plant something?',
               style: const TextStyle(
                 fontFamily: 'NotoSans',
@@ -227,37 +233,39 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           _selectedIndex == 0
               ? IconButton(
-                  icon: const Icon(Icons.checklist_rounded),
-                  iconSize: 25,
-                  color: Colors.black54,
-                  tooltip: 'Water all plants',
-                  onPressed: () {
-                    _showWaterAllPlantsDialog();
-                  },
-                )
+            icon: const Icon(Icons.checklist_rounded),
+            iconSize: 25,
+            color: Colors.black54,
+            tooltip: 'Apply care to all plants',
+            onPressed: () {
+              _showWaterAllPlantsDialog();
+            },
+          )
               : const SizedBox.shrink(),
           _selectedIndex == 0
               ? IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  iconSize: 25,
-                  color: Colors.black54,
-                  tooltip: 'Show Calendar',
-                  onPressed: () async {
-                    DateTime? result = await showDatePicker(
-                        context: context,
-                        initialDate:
-                            DateTime.now().add(const Duration(days: 1)),
-                        firstDate: DateTime.now().add(const Duration(days: 1)),
-                        lastDate: DateTime.now().add(const Duration(days: 7)));
-                    setState(() {
-                      if (result != null) {
-                        _dateFilter = result;
-                        _dateFilterEnabled = true;
-                        _loadPlants();
-                      }
-                    });
-                  },
-                )
+            icon: const Icon(Icons.calendar_today),
+            iconSize: 25,
+            color: Colors.black54,
+            tooltip: 'Show Calendar',
+            onPressed: () async {
+              DateTime? result = await showDatePicker(
+                  context: context,
+                  initialDate:
+                  DateTime.now().add(const Duration(days: 1)),
+                  firstDate: DateTime.now().add(const Duration(days: 1)),
+                  lastDate: DateTime.now().add(const Duration(days: 7)));
+              setState(() {
+                if (result != null) {
+                  var time = TimeOfDay.now();
+                  _dateFilter = result.add(
+                      Duration(hours: time.hour, minutes: time.minute));
+                  _dateFilterEnabled = true;
+                  _loadPlants();
+                }
+              });
+            },
+          )
               : const SizedBox.shrink(),
           IconButton(
             icon: const Icon(Icons.settings),
@@ -269,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute<void>(
                     builder: (context) =>
-                        const SettingsScreen(title: "Settings Screen"),
+                    const SettingsScreen(title: "Settings Screen"),
                   ));
             },
           ),
@@ -281,11 +289,11 @@ class _MyHomePageState extends State<MyHomePage> {
       body: _plants.isEmpty
           ? noPlants()
           : GridView.count(
-              crossAxisCount: 2,
-              padding: const EdgeInsets.all(16.0),
-              childAspectRatio: 8.0 / 9.0,
-              children: _buildGridCards(context) // Changed code
-              ),
+          crossAxisCount: 2,
+          padding: const EdgeInsets.all(16.0),
+          childAspectRatio: 8.0 / 10.0,
+          children: _buildPlantCards(context) // Changed code
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -309,7 +317,7 @@ class _MyHomePageState extends State<MyHomePage> {
               context,
               MaterialPageRoute<void>(
                 builder: (context) =>
-                    const ManagePlantScreen(title: "Manage plant"),
+                const ManagePlantScreen(title: "Manage plant"),
               ));
           setState(() {
             _selectedIndex = 1;
@@ -325,25 +333,40 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _loadPlants() async {
     List<Plant> plants = [];
+    Map<String, List<String>> cares = {};
+
     List<Plant> allPlants = objectbox.plantBox.getAll();
 
     DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
 
     if (_selectedIndex == 0) {
       for (Plant p in allPlants) {
+        cares[p.name] = [];
         for (Care c in p.cares) {
-          print((dateCheck.difference(c.effected!).inSeconds) / 60 / 60 / 24);
-          var cpsr = dateCheck.difference(c.effected!).inDays;
+          //print((dateCheck.difference(c.effected!).inSeconds) / 60 / 60 / 24);
+          var cpsr = dateCheck
+              .difference(c.effected!)
+              .inDays;
           if (cpsr != 0 && cpsr % c.cycles == 0) {
             plants.add(p);
+            cares[p.name]!.add(c.name);
           }
         }
       }
     } else {
       plants = allPlants;
+      for (Plant p in allPlants) {
+        cares[p.name] = [];
+        for (Care c in p.cares) {
+          cares[p.name]!.add(c.name);
+        }
+      }
     }
 
-    setState(() => _plants = plants);
+    setState(() {
+      _cares = cares;
+      _plants = plants;
+    });
   }
 
   _careAllPlants() async {
@@ -356,7 +379,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
         if (cpsr >= c.cycles) {
           c.effected = DateTime.now();
-          //await _plantRepository.updatePlant(p);
+
+          objectbox.plantBox.put(p);
         }
       }
     }
@@ -368,87 +392,112 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _deletePlant(Plant plant) async {
-    /*
-    for (var care in plant.cares) {
-      objectbox.careBox.remove(care.id);
-    }
-
-    objectbox.plantBox.remove(plant.id);
-    */
-
     await objectbox.removePlant(plant);
     _loadPlants();
   }
 
-  /*
-  _editPlant(Plant plant) async {
-    Plant updatedPlant = Plant.fromJson(plant.toJson());
-    updatedPlant.intensity = plant.intensity + 1;
-    await _plantRepository.updatePlant(updatedPlant);
-    _loadPlants();
+  List<Icon> _buildCares(BuildContext context, Plant plant) {
+    final ThemeData theme = Theme.of(context);
+
+    List<Icon> list = [];
+
+    _cares[plant.name]!.forEach((key) {
+      list.add(Icon(
+        DefaultValues.getCare(key)!.icon,
+        size: 21,
+        color: DefaultValues.getCare(key)!.color,
+      ));
+    });
+
+
+    return list;
   }
-   */
 
 // TODO: Make a collection of cards (102)
 // Replace this entire method
-  List<GestureDetector> _buildGridCards(BuildContext context) {
+  List<GestureDetector> _buildPlantCards(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
     return _plants.map((plant) {
       return GestureDetector(
-          onLongPress: () {
-            _deletePlant(plant);
-          },
-          onLongPressCancel: () {
-            print(plant.name);
-          },
-          child: Card(
-            clipBehavior: Clip.antiAlias,
-            // TODO: Adjust card heights (103)
-            child: Column(
-              // TODO: Center items on the card (103)
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                AspectRatio(
-                  aspectRatio: 18 / 11,
-                  child: plant.picture!.contains("assets/")
-                      ? Image.asset(
-                          plant.picture!,
-                          // TODO: Adjust the box size (102)
-                          fit: BoxFit.fitWidth,
-                        )
-                      : Image.file(
-                          File(plant.picture!),
-                          // TODO: Adjust the box size (102)
-                          fit: BoxFit.fitWidth,
-                        ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
-                    child: Column(
-                      // TODO: Align labels to the bottom and center (103)
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      // TODO: Change innermost Column (103)
-                      children: <Widget>[
-                        // TODO: Handle overflowing labels (103)
-                        Text(
-                          plant.name,
-                          style: theme.textTheme.headline6,
-                          maxLines: 1,
-                        ),
-                        const SizedBox(height: 8.0),
-                        Text(
-                          plant.description,
-                          style: theme.textTheme.subtitle2,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+        onLongPress: () {
+          _deletePlant(plant);
+        },
+        onLongPressCancel: () async {
+          print(plant.name);
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CarePlantScreen(title: plant.name),
+              // Pass the arguments as part of the RouteSettings. The
+              // DetailScreen reads the arguments from these settings.
+              settings: RouteSettings(
+                arguments: plant,
+              ),
             ),
-          ));
+          );
+          setState(() {
+            _selectedIndex = 0;
+            _loadPlants();
+          });
+        },
+        child: Card(
+          clipBehavior: Clip.antiAlias,
+          elevation: 5,
+          // TODO: Adjust card heights (103)
+          child: Column(
+            // TODO: Center items on the card (103)
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+          AspectRatio(
+          aspectRatio: 18 / 12,
+            child: plant.picture!.contains("assets/")
+                ? Image.asset(
+              plant.picture!,
+              // TODO: Adjust the box size (102)
+              fit: BoxFit.fitHeight,
+            )
+                : Image.file(
+              File(plant.picture!),
+              // TODO: Adjust the box size (102)
+              fit: BoxFit.fitWidth,
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
+              child: Column(
+                // TODO: Align labels to the bottom and center (103)
+                crossAxisAlignment: CrossAxisAlignment.start,
+                // TODO: Change innermost Column (103)
+                children: <Widget>[
+                // TODO: Handle overflowing labels (103)
+                Text(
+                plant.name,
+                style: theme.textTheme.headline6,
+                maxLines: 1,
+              ),
+              const SizedBox(height: 2.0),
+              Text(
+                plant.description,
+                style: theme.textTheme.subtitle2,
+              ),
+              const SizedBox(height: 6.0),
+              Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children:
+                  _buildCares(context, plant)
+
+            )
+            ],
+          ),
+        ),
+      ),]
+      ,
+      )
+      ,
+      )
+      );
     }).toList();
   }
 }

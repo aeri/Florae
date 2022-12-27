@@ -35,13 +35,13 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
   print("[BackgroundFetch] Headless event received: $taskId");
 
-
   ObjectBox obx = await ObjectBox.create();
 
-
   List<Plant> allPlants = obx.plantBox.getAll();
-  List<String> plants = [];
 
+  obx.store.close();
+
+  List<String> plants = [];
 
   for (Plant p in allPlants) {
     for (Care c in p.cares){
@@ -59,13 +59,11 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
 
   if (plants.isNotEmpty){
-    notify.singleNotification("Plants require care", plants.join(' '), 7);
+    notify.singleNotification("Plants require care", plants.join('\n'), 7);
   }
   else{
     print ("florae no plants require care");
   }
-  obx.store.close();
-
 
   print("[BackgroundFetch] Headless event finished: $taskId");
 

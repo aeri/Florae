@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:florae/data/default.dart';
 import 'package:florae/data/plant.dart';
 import 'package:florae/main.dart';
 import 'package:flutter/material.dart';
@@ -106,18 +107,40 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     _loadPlants();
 
     cares["water"] = Care(cycles: 1, effected: DateTime.now(), name: "water");
-    cares["rotate"] = Care(cycles: 0, effected:  DateTime.now(), name: "rotate");
-    cares["spray"] = Care(cycles: 0, effected:  DateTime.now(), name: "spray");
-    cares["prune"] = Care(cycles: 0, effected:  DateTime.now(), name: "prune");
-    cares["fertilise"] = Care(cycles: 0, effected:  DateTime.now(), name: "fertilise");
-    cares["transplant"] = Care(cycles: 0, effected:  DateTime.now(), name: "transplant");
-    cares["clean"] = Care(cycles: 0, effected:  DateTime.now(), name: "clean");
-
+    cares["rotate"] = Care(cycles: 0, effected: DateTime.now(), name: "rotate");
+    cares["spray"] = Care(cycles: 0, effected: DateTime.now(), name: "spray");
+    cares["prune"] = Care(cycles: 0, effected: DateTime.now(), name: "prune");
+    cares["fertilise"] =
+        Care(cycles: 0, effected: DateTime.now(), name: "fertilise");
+    cares["transplant"] =
+        Care(cycles: 0, effected: DateTime.now(), name: "transplant");
+    cares["clean"] = Care(cycles: 0, effected: DateTime.now(), name: "clean");
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  List<ListTile> _buildCares(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    List<ListTile> list = [];
+
+    DefaultValues.getCares().forEach((key, value) {
+      list.add(ListTile(
+          trailing: Icon(Icons.arrow_right),
+          leading: Icon(value.icon, color: value.color),
+          title: Text('${value.translatedName} every'),
+          subtitle: cares[key]!.cycles != 0
+              ? Text(cares[key]!.cycles.toString() + " days")
+              : Text("Never"),
+          onTap: () {
+            _showIntegerDialog(key);
+          }));
+    });
+
+    return list;
   }
 
   @override
@@ -270,7 +293,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                           focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.teal)),
                         ),
-                      )
+                      ),
                     ]),
                   ),
                 ),
@@ -282,109 +305,32 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
-                child: Column(children: <Widget>[
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.opacity, color: Colors.blue),
-                      title: const Text('Water every'),
-                      subtitle: cares["water"]!.cycles != 0
-                          ? Text(cares["water"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("water");
-                      }),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.air, color: Colors.lightGreen),
-                      title: const Text('Spray every'),
-                      subtitle: cares["spray"]!.cycles != 0
-                          ? Text(cares["spray"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("spray");
-                      }),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.rotate_90_degrees_ccw,
-                          color: Colors.purple),
-                      title: const Text('Rotate every'),
-                      subtitle: cares["rotate"]!.cycles != 0
-                          ? Text(cares["rotate"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("rotate");
-                      }),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.cut, color: Colors.orange),
-                      title: const Text('Pruning every'),
-                      subtitle: cares["prune"]!.cycles != 0
-                          ? Text(cares["prune"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("prune");
-                      }),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.workspaces_filled,
-                          color: Colors.brown),
-                      title: const Text('Fertilise every'),
-                      subtitle: cares["fertilise"]!.cycles != 0
-                          ? Text(
-                              cares["fertilise"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("fertilise");
-                      }),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.compost,
-                          color: Colors.green),
-                      title: const Text('Transplant every'),
-                      subtitle: cares["transplant"]!.cycles != 0
-                          ? Text(
-                              cares["transplant"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("transplant");
-                      }),
-                  ListTile(
-                    trailing: const Icon(Icons.arrow_right),
-                    leading: const Icon(Icons.cleaning_services,
-                        color: Colors.blueGrey),
-                    title: const Text('Clean every'),
-                    subtitle: cares["clean"]!.cycles != 0
-                        ? Text(cares["clean"]!.cycles.toString() + " days")
-                        : const Text("Never"),
-                    onTap: () {
-                      _showIntegerDialog("clean");
-                    },
-                  ),
-                  ListTile(
-                    trailing: const Icon(Icons.arrow_right),
-                    leading: Icon(Icons.cake),
-                    title: Text('Day planted'),
-                    subtitle: Text(DateFormat.yMMMMEEEEd().format(_planted)),
-                    onTap: () async {
-                      DateTime? result = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate:
-                              DateTime.now().subtract(Duration(days: 1000)),
-                          lastDate: DateTime.now());
-                      setState(() {
-                        _planted = result ?? DateTime.now();
-                      });
-                    },
-                  ),
-                  /*
-                  const ListTile(
-                    leading: Icon(Icons.group),
-                    title: Text('Contact group'),
-                    subtitle: Text('Not specified'),
-                  ),
-                   */
-                ]),
+                child: Column(children: _buildCares(context)),
+              ),
+              Card(
+                semanticContainer: true,
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: ListTile(
+                  trailing: const Icon(Icons.arrow_right),
+                  leading: Icon(Icons.cake),
+                  title: Text('Day planted'),
+                  subtitle: Text(DateFormat.yMMMMEEEEd().format(_planted)),
+                  onTap: () async {
+                    DateTime? result = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate:
+                            DateTime.now().subtract(Duration(days: 1000)),
+                        lastDate: DateTime.now());
+                    setState(() {
+                      _planted = result ?? DateTime.now();
+                    });
+                  },
+                ),
               ),
               const SizedBox(height: 70),
             ],
@@ -402,7 +348,6 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               _image!.saveTo(fileName);
             }
 
-
             final newPlant = Plant(
                 name: nameController.text,
                 createdAt: DateTime.now(),
@@ -413,8 +358,9 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                 location: locationController.text);
 
             cares.forEach((key, value) {
-              if (value.cycles != 0){
-                newPlant.cares.add(Care(cycles: value.cycles, effected: value.effected, name: key));
+              if (value.cycles != 0) {
+                newPlant.cares.add(Care(
+                    cycles: value.cycles, effected: value.effected, name: key));
               }
             });
 

@@ -83,11 +83,9 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                   child: SizedBox(
                       child: Column(
                     children: <Widget>[
-                      const SizedBox(height: 10),
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(20.0), //or 15.0
                         child: Container(
-                          height: 200,
+                          height: 220,
                           child: plant.picture!.contains("assets/")
                               ? Image.asset(
                                   plant.picture!,
@@ -101,8 +99,6 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                                 ),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      SizedBox(height: 10),
                     ],
                   )),
                 ),

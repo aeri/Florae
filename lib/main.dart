@@ -53,7 +53,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     }
   }
 
-  print ("florae detected plants " + plants.join(' '));
+  print ("headless florae detected plants " + plants.join(' '));
 
 //  notify.singleNotification("Florae", "Headless notification", 7);
 

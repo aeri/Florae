@@ -7,7 +7,7 @@ import 'package:florae/data/plant.dart';
 import 'package:florae/notifications.dart' as notify;
 
 import 'package:intl/intl.dart';
-import '../data/default.dart';
+import 'package:responsive_grid_list/responsive_grid_list.dart';
 import '../data/default.dart';
 import '../main.dart';
 import 'manage_plant.dart';
@@ -91,16 +91,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
       for (Plant p in allPlants) {
         for (Care c in p.cares) {
-          var cpsr = DateTime
-              .now()
-              .difference(c.effected!)
-              .inDays;
+          var cpsr = DateTime.now().difference(c.effected!).inDays;
           if (cpsr != 0 && cpsr % c.cycles == 0) {
             plants.add(p.name);
           }
           break;
         }
       }
+
+      print("foreground florae detected plants " + plants.join(' '));
 
       if (plants.isNotEmpty) {
         notify.singleNotification("Plants require care", plants.join(' '), 7);
@@ -166,10 +165,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget noPlants() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(15.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+
             SvgPicture.asset(
               _selectedIndex == 0
                   ? "assets/undraw_fall_thyk.svg"
@@ -178,9 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
               alignment: Alignment.center,
               height: 250,
             ),
-            const SizedBox(
-              height: 20,
-            ),
+
             Text(
               _selectedIndex == 0
                   ? 'Yay! You don\'t have any pending plants to care'
@@ -233,39 +231,39 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           _selectedIndex == 0
               ? IconButton(
-            icon: const Icon(Icons.checklist_rounded),
-            iconSize: 25,
-            color: Colors.black54,
-            tooltip: 'Apply care to all plants',
-            onPressed: () {
-              _showWaterAllPlantsDialog();
-            },
-          )
+                  icon: const Icon(Icons.checklist_rounded),
+                  iconSize: 25,
+                  color: Colors.black54,
+                  tooltip: 'Apply care to all plants',
+                  onPressed: () {
+                    _showWaterAllPlantsDialog();
+                  },
+                )
               : const SizedBox.shrink(),
           _selectedIndex == 0
               ? IconButton(
-            icon: const Icon(Icons.calendar_today),
-            iconSize: 25,
-            color: Colors.black54,
-            tooltip: 'Show Calendar',
-            onPressed: () async {
-              DateTime? result = await showDatePicker(
-                  context: context,
-                  initialDate:
-                  DateTime.now().add(const Duration(days: 1)),
-                  firstDate: DateTime.now().add(const Duration(days: 1)),
-                  lastDate: DateTime.now().add(const Duration(days: 7)));
-              setState(() {
-                if (result != null) {
-                  var time = TimeOfDay.now();
-                  _dateFilter = result.add(
-                      Duration(hours: time.hour, minutes: time.minute));
-                  _dateFilterEnabled = true;
-                  _loadPlants();
-                }
-              });
-            },
-          )
+                  icon: const Icon(Icons.calendar_today),
+                  iconSize: 25,
+                  color: Colors.black54,
+                  tooltip: 'Show Calendar',
+                  onPressed: () async {
+                    DateTime? result = await showDatePicker(
+                        context: context,
+                        initialDate:
+                            DateTime.now().add(const Duration(days: 1)),
+                        firstDate: DateTime.now().add(const Duration(days: 1)),
+                        lastDate: DateTime.now().add(const Duration(days: 7)));
+                    setState(() {
+                      if (result != null) {
+                        var time = TimeOfDay.now();
+                        _dateFilter = result.add(
+                            Duration(hours: time.hour, minutes: time.minute));
+                        _dateFilterEnabled = true;
+                        _loadPlants();
+                      }
+                    });
+                  },
+                )
               : const SizedBox.shrink(),
           IconButton(
             icon: const Icon(Icons.settings),
@@ -277,7 +275,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute<void>(
                     builder: (context) =>
-                    const SettingsScreen(title: "Settings Screen"),
+                        const SettingsScreen(title: "Settings Screen"),
                   ));
             },
           ),
@@ -288,12 +286,20 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: _plants.isEmpty
           ? noPlants()
-          : GridView.count(
-          crossAxisCount: 2,
-          padding: const EdgeInsets.all(16.0),
-          childAspectRatio: 8.0 / 10.0,
-          children: _buildPlantCards(context) // Changed code
-      ),
+          : ResponsiveGridList(
+              horizontalGridSpacing: 10,
+              // Horizontal space between grid items
+              horizontalGridMargin: 10,
+              // Horizontal space around the grid
+              verticalGridMargin: 10,
+              // Vertical space around the grid
+              minItemWidth: 300,
+              // The minimum item width (can be smaller, if the layout constraints are smaller)
+              minItemsPerRow: 2,
+              // The minimum items to show in a single row. Takes precedence over minItemWidth
+              maxItemsPerRow: 2,
+              children: _buildPlantCards(context) // Changed code
+              ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -317,7 +323,7 @@ class _MyHomePageState extends State<MyHomePage> {
               context,
               MaterialPageRoute<void>(
                 builder: (context) =>
-                const ManagePlantScreen(title: "Manage plant"),
+                    const ManagePlantScreen(title: "Manage plant"),
               ));
           setState(() {
             _selectedIndex = 1;
@@ -344,9 +350,7 @@ class _MyHomePageState extends State<MyHomePage> {
         cares[p.name] = [];
         for (Care c in p.cares) {
           //print((dateCheck.difference(c.effected!).inSeconds) / 60 / 60 / 24);
-          var cpsr = dateCheck
-              .difference(c.effected!)
-              .inDays;
+          var cpsr = dateCheck.difference(c.effected!).inDays;
           if (cpsr != 0 && cpsr % c.cycles == 0) {
             plants.add(p);
             cares[p.name]!.add(c.name);
@@ -402,13 +406,11 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Icon> list = [];
 
     _cares[plant.name]!.forEach((key) {
-      list.add(Icon(
-        DefaultValues.getCare(key)!.icon,
-        size: 21,
-        color: DefaultValues.getCare(key)!.color,
-      ));
+      list.add(
+        Icon(DefaultValues.getCare(key)!.icon,
+            color: DefaultValues.getCare(key)!.color),
+      );
     });
-
 
     return list;
   }
@@ -420,84 +422,88 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return _plants.map((plant) {
       return GestureDetector(
-        onLongPress: () {
-          _deletePlant(plant);
-        },
-        onLongPressCancel: () async {
-          print(plant.name);
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CarePlantScreen(title: plant.name),
-              // Pass the arguments as part of the RouteSettings. The
-              // DetailScreen reads the arguments from these settings.
-              settings: RouteSettings(
-                arguments: plant,
+          onLongPress: () {
+            _deletePlant(plant);
+          },
+          onLongPressCancel: () async {
+            print(plant.name);
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CarePlantScreen(title: plant.name),
+                // Pass the arguments as part of the RouteSettings. The
+                // DetailScreen reads the arguments from these settings.
+                settings: RouteSettings(
+                  arguments: plant,
+                ),
               ),
-            ),
-          );
-          setState(() {
-            _selectedIndex = 0;
-            _loadPlants();
-          });
-        },
-        child: Card(
-          clipBehavior: Clip.antiAlias,
-          elevation: 5,
-          // TODO: Adjust card heights (103)
-          child: Column(
-            // TODO: Center items on the card (103)
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-          AspectRatio(
-          aspectRatio: 18 / 12,
-            child: plant.picture!.contains("assets/")
-                ? Image.asset(
-              plant.picture!,
-              // TODO: Adjust the box size (102)
-              fit: BoxFit.fitHeight,
-            )
-                : Image.file(
-              File(plant.picture!),
-              // TODO: Adjust the box size (102)
-              fit: BoxFit.fitWidth,
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
-              child: Column(
-                // TODO: Align labels to the bottom and center (103)
-                crossAxisAlignment: CrossAxisAlignment.start,
-                // TODO: Change innermost Column (103)
-                children: <Widget>[
-                // TODO: Handle overflowing labels (103)
-                Text(
-                plant.name,
-                style: theme.textTheme.headline6,
-                maxLines: 1,
-              ),
-              const SizedBox(height: 2.0),
-              Text(
-                plant.description,
-                style: theme.textTheme.subtitle2,
-              ),
-              const SizedBox(height: 6.0),
-              Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children:
-                  _buildCares(context, plant)
+            );
+            setState(() {
+              _selectedIndex = 0;
+              _loadPlants();
+            });
+          },
+          child: Card(
+            clipBehavior: Clip.antiAlias,
+            elevation: 5,
+            // TODO: Adjust card heights (103)
+            child: Column(
+              // TODO: Center items on the card (103)
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                AspectRatio(
+                  aspectRatio: 18 / 12,
+                  child: plant.picture!.contains("assets/")
+                      ? Image.asset(
+                          plant.picture!,
+                          // TODO: Adjust the box size (102)
+                          fit: BoxFit.fitHeight,
+                        )
+                      : Image.file(
+                          File(plant.picture!),
+                          // TODO: Adjust the box size (102)
+                          fit: BoxFit.fitWidth,
+                        ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
+                    child: Column(
+                      // TODO: Align labels to the bottom and center (103)
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      // TODO: Change innermost Column (103)
+                      children: <Widget>[
+                        // TODO: Handle overflowing labels (103)
+                        FittedBox(
+                          fit: BoxFit.fitWidth,
+                          child: Text(
+                            plant.name,
+                            style: theme.textTheme.headline6,
+                            maxLines: 1,
+                          ),
+                        ),
 
-            )
-            ],
-          ),
-        ),
-      ),]
-      ,
-      )
-      ,
-      )
-      );
+                        const SizedBox(height: 6.0),
+                        Text(
+                          plant.description,
+                          style: theme.textTheme.subtitle2,
+                        ),
+                        const SizedBox(height: 8.0),
+                        Container(
+                            height: 20.0,
+                            child: FittedBox(
+                              alignment: Alignment.centerLeft,
+                              child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: _buildCares(context, plant)),
+                            )),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ));
     }).toList();
   }
 }

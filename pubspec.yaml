@@ -78,14 +78,14 @@ flutter:
     - assets/undraw_flowers_vx06.svg
     - assets/undraw_blooming_re_2kc4.svg
     - assets/undraw_different_love_a-3-rg.svg
-    - assets/florae_avatar (1).png
-    - assets/florae_avatar (2).png
-    - assets/florae_avatar (3).png
-    - assets/florae_avatar (4).png
-    - assets/florae_avatar (5).png
-    - assets/florae_avatar (6).png
-    - assets/florae_avatar (7).png
-    - assets/florae_avatar (8).png
+    - assets/florae_avatar_1.png
+    - assets/florae_avatar_2.png
+    - assets/florae_avatar_3.png
+    - assets/florae_avatar_4.png
+    - assets/florae_avatar_5.png
+    - assets/florae_avatar_6.png
+    - assets/florae_avatar_7.png
+    - assets/florae_avatar_8.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -31,6 +31,7 @@ class Plant {
 
   Plant(
       {required this.name,
+      this.id = 0,
       this.location,
       this.description = "",
       required this.createdAt,

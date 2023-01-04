@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:florae/data/plant.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../data/default.dart';
 import '../main.dart';
+import 'manage_plant.dart';
 
 class CarePlantScreen extends StatefulWidget {
   const CarePlantScreen({Key? key, required this.title}) : super(key: key);
@@ -118,6 +120,10 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                         leading: Icon(Icons.location_on),
                         title: Text('Location'),
                         subtitle: Text(plant.location ?? "")),
+                    ListTile(
+                        leading: Icon(Icons.cake),
+                        title: Text('Day planted'),
+                        subtitle: Text(DateFormat.yMMMMd().format(plant.createdAt))),
                   ]),
                 ),
                 Card(
@@ -150,6 +156,20 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                 backgroundColor: Colors.redAccent,
               ),
               FloatingActionButton.extended(
+                heroTag: "edit",
+                onPressed: () async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (context) =>
+                        ManagePlantScreen(title: "Manage plant", update: true, plant: plant),
+                      ));
+                },
+                label: const Text('Edit'),
+                icon: const Icon(Icons.edit),
+                backgroundColor: Colors.blueGrey,
+              ),
+              FloatingActionButton.extended(
                 heroTag: "care",
                 onPressed: () {
                   if (!cares.containsValue(true)) {
@@ -170,7 +190,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                 },
                 label: const Text('Care'),
                 icon: const Icon(Icons.check),
-                backgroundColor: Colors.blueGrey,
+                backgroundColor: Colors.greenAccent,
               )
             ],
           ),

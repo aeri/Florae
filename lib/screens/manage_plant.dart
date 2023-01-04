@@ -12,15 +12,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 
 class ManagePlantScreen extends StatefulWidget {
-  const ManagePlantScreen({Key? key, required this.title}) : super(key: key);
+  const ManagePlantScreen({Key? key, required this.title, required this.update, this.plant}) : super(key: key);
 
   final String title;
+  final bool update;
+  final Plant? plant;
 
   @override
   State<ManagePlantScreen> createState() => _ManagePlantScreen();
 }
 
 class _ManagePlantScreen extends State<ManagePlantScreen> {
+
   Map<String, Care> cares = {};
 
   DateTime _planted = DateTime.now();
@@ -106,15 +109,34 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     super.initState();
     _loadPlants();
 
-    cares["water"] = Care(cycles: 1, effected: DateTime.now(), name: "water");
-    cares["rotate"] = Care(cycles: 0, effected: DateTime.now(), name: "rotate");
-    cares["spray"] = Care(cycles: 0, effected: DateTime.now(), name: "spray");
-    cares["prune"] = Care(cycles: 0, effected: DateTime.now(), name: "prune");
-    cares["fertilise"] =
-        Care(cycles: 0, effected: DateTime.now(), name: "fertilise");
-    cares["transplant"] =
-        Care(cycles: 0, effected: DateTime.now(), name: "transplant");
-    cares["clean"] = Care(cycles: 0, effected: DateTime.now(), name: "clean");
+    // If is an update, restore old cares
+    if (widget.update && widget.plant != null){
+      for (var care in widget.plant!.cares) {
+        cares[care.name] = Care(name: care.name, cycles: care.cycles, effected: care.effected);
+      }
+      nameController.text = widget.plant!.name;
+      descriptionController.text = widget.plant!.description;
+      locationController.text = widget.plant!.location ?? "";
+
+
+      if (widget.plant!.picture!.contains("florae_avatar")){
+        String? asset = widget.plant!.picture!.replaceAll(RegExp(r'[^0-9]'),''); // '23'
+        _prefNumber = int.tryParse(asset) ?? 1;
+      }
+      else{
+        _image = XFile(widget.plant!.picture!);
+      }
+
+
+
+    }
+
+    // Filling in the empty cares
+    DefaultValues.getCares().forEach((key, value) {
+      if (cares[key] == null){
+       cares [key] =  Care(cycles: value.defaultCycles, effected: DateTime.now(), name: key);
+      }
+    });
   }
 
   @override
@@ -129,12 +151,12 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
     DefaultValues.getCares().forEach((key, value) {
       list.add(ListTile(
-          trailing: Icon(Icons.arrow_right),
+          trailing: const Icon(Icons.arrow_right),
           leading: Icon(value.icon, color: value.color),
           title: Text('${value.translatedName} every'),
           subtitle: cares[key]!.cycles != 0
               ? Text(cares[key]!.cycles.toString() + " days")
-              : Text("Never"),
+              : const Text("Never"),
           onTap: () {
             _showIntegerDialog(key);
           }));
@@ -148,7 +170,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('New plant'),
+        title: widget.update ? const Text('Edit plant') : const Text('New plant'),
         elevation: 0.0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
@@ -180,7 +202,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         height: 200,
                         child: _image == null
                             ? Image.asset(
-                                "assets/florae_avatar (${_prefNumber}).png",
+                                "assets/florae_avatar_${_prefNumber}.png",
                                 // TODO: Adjust the box size (102)
                                 fit: BoxFit.fitWidth,
                               )
@@ -226,7 +248,11 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     child: Column(children: <Widget>[
                       TextFormField(
                         controller: nameController,
+                        enabled: !widget.update,
                         validator: (value) {
+                          if (widget.update){
+                            return null;
+                          }
                           if (value == null || value.isEmpty) {
                             return 'Please enter some text';
                           }
@@ -317,6 +343,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                 child: ListTile(
                   trailing: const Icon(Icons.arrow_right),
                   leading: Icon(Icons.cake),
+                  enabled: !widget.update,
                   title: Text('Day planted'),
                   subtitle: Text(DateFormat.yMMMMEEEEd().format(_planted)),
                   onTap: () async {
@@ -349,14 +376,16 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
             }
 
             final newPlant = Plant(
+                id: widget.plant != null ? widget.plant!.id : 0,
                 name: nameController.text,
                 createdAt: DateTime.now(),
                 description: descriptionController.text,
                 picture: _image != null
                     ? fileName
-                    : "assets/florae_avatar (${_prefNumber}).png",
+                    : "assets/florae_avatar_${_prefNumber}.png",
                 location: locationController.text);
 
+            newPlant.cares.clear();
             cares.forEach((key, value) {
               if (value.cycles != 0) {
                 newPlant.cares.add(Care(

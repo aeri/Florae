@@ -91,8 +91,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
       for (Plant p in allPlants) {
         for (Care c in p.cares) {
-          var cpsr = DateTime.now().difference(c.effected!).inDays;
-          if (cpsr != 0 && cpsr % c.cycles == 0) {
+          var daysSinceLastCare = DateTime.now().difference(c.effected!).inDays;
+          if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles == 0) {
             plants.add(p.name);
           }
           break;
@@ -169,7 +169,6 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-
             SvgPicture.asset(
               _selectedIndex == 0
                   ? "assets/undraw_fall_thyk.svg"
@@ -178,7 +177,6 @@ class _MyHomePageState extends State<MyHomePage> {
               alignment: Alignment.center,
               height: 250,
             ),
-
             Text(
               _selectedIndex == 0
                   ? 'Yay! You don\'t have any pending plants to care'
@@ -323,7 +321,7 @@ class _MyHomePageState extends State<MyHomePage> {
               context,
               MaterialPageRoute<void>(
                 builder: (context) =>
-                    const ManagePlantScreen(title: "Manage plant"),
+                    const ManagePlantScreen(title: "Manage plant", update: false),
               ));
           setState(() {
             _selectedIndex = 1;
@@ -345,17 +343,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
     DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
 
+    bool inserted = false;
+
     if (_selectedIndex == 0) {
       for (Plant p in allPlants) {
         cares[p.name] = [];
         for (Care c in p.cares) {
-          //print((dateCheck.difference(c.effected!).inSeconds) / 60 / 60 / 24);
-          var cpsr = dateCheck.difference(c.effected!).inDays;
-          if (cpsr != 0 && cpsr % c.cycles == 0) {
-            plants.add(p);
+          var daysSinceLastCare = dateCheck.difference(c.effected!).inDays;
+          if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles == 0) {
+            if (!inserted) {
+              plants.add(p);
+              inserted = true;
+            }
             cares[p.name]!.add(c.name);
           }
         }
+        inserted = false;
       }
     } else {
       plants = allPlants;
@@ -379,9 +382,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     for (Plant p in allPlants) {
       for (Care c in p.cares) {
-        var cpsr = (dateCheck.compareTo(c.effected!) / 60 / 60 / 24).round();
-
-        if (cpsr >= c.cycles) {
+        var daysSinceLastCare =
+            (dateCheck.compareTo(c.effected!) / 60 / 60 / 24).round();
+        if (daysSinceLastCare >= c.cycles) {
           c.effected = DateTime.now();
 
           objectbox.plantBox.put(p);
@@ -453,7 +456,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 AspectRatio(
                   aspectRatio: 18 / 12,
-                  child: plant.picture!.contains("assets/")
+                  child: plant.picture!.contains("florae_avatar")
                       ? Image.asset(
                           plant.picture!,
                           // TODO: Adjust the box size (102)

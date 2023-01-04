@@ -39,34 +39,32 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
   List<Plant> allPlants = obx.plantBox.getAll();
 
-  obx.store.close();
 
   List<String> plants = [];
 
   for (Plant p in allPlants) {
     for (Care c in p.cares){
       var cpsr = DateTime.now().difference(c.effected!).inDays;
+      print ("headless florae plant ${p.name} with days since last care $cpsr");
       if (cpsr != 0 && cpsr % c.cycles == 0) {
         plants.add(p.name);
+        break;
       }
-      break;
     }
   }
 
-  print ("headless florae detected plants " + plants.join(' '));
-
-//  notify.singleNotification("Florae", "Headless notification", 7);
-
-
   if (plants.isNotEmpty){
     notify.singleNotification("Plants require care", plants.join('\n'), 7);
+    print ("headless florae detected plants " + plants.join(' '));
+
   }
   else{
-    print ("florae no plants require care");
+    print ("headless florae no plants require care");
   }
 
   print("[BackgroundFetch] Headless event finished: $taskId");
 
+  obx.store.close();
 
   BackgroundFetch.finish(taskId);
 }

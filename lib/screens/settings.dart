@@ -15,7 +15,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreen extends State<SettingsScreen> {
-  int periodityCheckInHours = 1;
+  int periodicityCheckInHours = 1;
 
   void _showIntegerDialog(String care) async {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -27,14 +27,14 @@ class _SettingsScreen extends State<SettingsScreen> {
             content: StatefulBuilder(builder: (context, SBsetState) {
               return NumberPicker(
                   selectedTextStyle: const TextStyle(color: Colors.teal),
-                  value: periodityCheckInHours,
+                  value: periodicityCheckInHours,
                   minValue: 1,
                   maxValue: 24,
                   onChanged: (value) {
                     setState(() {
-                      periodityCheckInHours = value;
+                      periodicityCheckInHours = value;
                     });
-                    SBsetState(() => periodityCheckInHours =
+                    SBsetState(() => periodicityCheckInHours =
                         value); //* to change on dialog state
                   });
             }),
@@ -93,8 +93,8 @@ class _SettingsScreen extends State<SettingsScreen> {
                       trailing: const Icon(Icons.arrow_right),
                       leading: const Icon(Icons.alarm, color: Colors.blue),
                       title: const Text('Notify every'),
-                      subtitle: periodityCheckInHours != 0
-                          ? Text(periodityCheckInHours.toString() + " hours")
+                      subtitle: periodicityCheckInHours != 0
+                          ? Text(periodicityCheckInHours.toString() + " hours")
                           : const Text("Never"),
                       onTap: () {
                         _showIntegerDialog("water");
@@ -108,14 +108,6 @@ class _SettingsScreen extends State<SettingsScreen> {
                         notify.singleNotification("Florae Test Notification",
                             "This is a test message", 2);
                       }),
-
-                  /*
-                  const ListTile(
-                    leading: Icon(Icons.group),
-                    title: Text('Contact group'),
-                    subtitle: Text('Not specified'),
-                  ),
-                   */
                 ]),
               ),
               Card(

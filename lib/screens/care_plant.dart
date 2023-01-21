@@ -64,6 +64,22 @@ class _CarePlantScreen extends State<CarePlantScreen> {
           elevation: 0.0,
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.edit),
+              iconSize: 25,
+              color: Colors.black54,
+              tooltip: 'Edit this care to all plants',
+              onPressed: () async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => ManagePlantScreen(
+                          title: "Manage plant", update: true, plant: plant),
+                    ));
+              },
+            )
+          ],
           titleTextStyle: const TextStyle(
               color: Colors.black54,
               fontSize: 40,
@@ -123,7 +139,8 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                     ListTile(
                         leading: Icon(Icons.cake),
                         title: Text('Day planted'),
-                        subtitle: Text(DateFormat.yMMMMd().format(plant.createdAt))),
+                        subtitle:
+                            Text(DateFormat.yMMMMd().format(plant.createdAt))),
                   ]),
                 ),
                 Card(
@@ -156,27 +173,12 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                 backgroundColor: Colors.redAccent,
               ),
               FloatingActionButton.extended(
-                heroTag: "edit",
-                onPressed: () async {
-                  await Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (context) =>
-                        ManagePlantScreen(title: "Manage plant", update: true, plant: plant),
-                      ));
-                },
-                label: const Text('Edit'),
-                icon: const Icon(Icons.edit),
-                backgroundColor: Colors.blueGrey,
-              ),
-              FloatingActionButton.extended(
                 heroTag: "care",
                 onPressed: () {
                   if (!cares.containsValue(true)) {
                     print("NO CARES");
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Select at least one care')
-                    ));
+                        SnackBar(content: Text('Select at least one care')));
                   } else {
                     cares.forEach((key, value) {
                       int careIndex = plant.cares

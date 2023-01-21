@@ -7,6 +7,7 @@ import 'package:florae/main.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:objectbox/objectbox.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
@@ -126,8 +127,6 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       else{
         _image = XFile(widget.plant!.picture!);
       }
-
-
 
     }
 
@@ -386,6 +385,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                 location: locationController.text);
 
             newPlant.cares.clear();
+
             cares.forEach((key, value) {
               if (value.cycles != 0) {
                 newPlant.cares.add(Care(
@@ -393,9 +393,16 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               }
             });
 
+            // ObjectBox does not track ToMany changes
+            // https://github.com/objectbox/objectbox-dart/issues/326
+            if (widget.update && widget.plant != null){
+              widget.plant!.cares.clear();
+              objectbox.plantBox.put(widget.plant!);
+            }
+
             objectbox.plantBox.put(newPlant);
             print(newPlant);
-            Navigator.pop(context);
+            Navigator.popUntil(context, ModalRoute.withName('/'));
           }
         },
         label: const Text('Save'),

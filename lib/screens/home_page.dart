@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       var status = await BackgroundFetch.configure(
           BackgroundFetchConfig(
-              minimumFetchInterval: 15,
+              minimumFetchInterval: 60,
               forceAlarmManager: false,
               stopOnTerminate: false,
               startOnBoot: true,
@@ -350,7 +350,7 @@ class _MyHomePageState extends State<MyHomePage> {
         cares[p.name] = [];
         for (Care c in p.cares) {
           var daysSinceLastCare = dateCheck.difference(c.effected!).inDays;
-          if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles == 0) {
+          if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles >= 0) {
             if (!inserted) {
               plants.add(p);
               inserted = true;
@@ -398,9 +398,23 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  _deletePlant(Plant plant) async {
-    await objectbox.removePlant(plant);
-    _loadPlants();
+  _openPlant(Plant plant) async {
+    print(plant.name);
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CarePlantScreen(title: plant.name),
+        // Pass the arguments as part of the RouteSettings. The
+        // DetailScreen reads the arguments from these settings.
+        settings: RouteSettings(
+          arguments: plant,
+        ),
+      ),
+    );
+    setState(() {
+      _selectedIndex = 0;
+      _loadPlants();
+    });
   }
 
   List<Icon> _buildCares(BuildContext context, Plant plant) {
@@ -425,33 +439,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return _plants.map((plant) {
       return GestureDetector(
-          onLongPress: () {
-            _deletePlant(plant);
-          },
           onLongPressCancel: () async {
-            print(plant.name);
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CarePlantScreen(title: plant.name),
-                // Pass the arguments as part of the RouteSettings. The
-                // DetailScreen reads the arguments from these settings.
-                settings: RouteSettings(
-                  arguments: plant,
-                ),
-              ),
-            );
-            setState(() {
-              _selectedIndex = 0;
-              _loadPlants();
-            });
+            await _openPlant(plant);
           },
           child: Card(
             clipBehavior: Clip.antiAlias,
             elevation: 5,
-            // TODO: Adjust card heights (103)
             child: Column(
-              // TODO: Center items on the card (103)
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 AspectRatio(
@@ -459,12 +453,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: plant.picture!.contains("florae_avatar")
                       ? Image.asset(
                           plant.picture!,
-                          // TODO: Adjust the box size (102)
                           fit: BoxFit.fitHeight,
                         )
                       : Image.file(
                           File(plant.picture!),
-                          // TODO: Adjust the box size (102)
                           fit: BoxFit.fitWidth,
                         ),
                 ),
@@ -472,11 +464,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
                     child: Column(
-                      // TODO: Align labels to the bottom and center (103)
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      // TODO: Change innermost Column (103)
                       children: <Widget>[
-                        // TODO: Handle overflowing labels (103)
                         FittedBox(
                           fit: BoxFit.fitWidth,
                           child: Text(
@@ -496,9 +485,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             height: 20.0,
                             child: FittedBox(
                               alignment: Alignment.centerLeft,
-                              child: Row(
+                              child: plant.cares.isNotEmpty ? Row(
                                   mainAxisSize: MainAxisSize.max,
-                                  children: _buildCares(context, plant)),
+                                  children: _buildCares(context, plant)) : null,
                             )),
                       ],
                     ),

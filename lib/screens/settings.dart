@@ -96,9 +96,18 @@ class _SettingsScreen extends State<SettingsScreen> {
                       subtitle: periodicityCheckInHours != 0
                           ? Text(periodicityCheckInHours.toString() + " hours")
                           : const Text("Never"),
+
                       onTap: () {
                         _showIntegerDialog("water");
                       }),
+            ListTile(
+              leading: Icon(Icons.info_outline_rounded),
+              subtitle: Transform.translate(
+                offset: Offset(-10, -5),
+                child: Text('The notification time will be reset when you enter the App.'
+                    '\n\nPlease note that some devices perform very aggressive battery optimizations that may cause notifications to not be issued correctly.'),
+              ),
+            ),
                   ListTile(
                       trailing: const Icon(Icons.arrow_right),
                       leading: const Icon(Icons.circle_notifications,

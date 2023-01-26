@@ -3,7 +3,8 @@ import 'package:numberpicker/numberpicker.dart';
 
 import 'package:florae/notifications.dart' as notify;
 
-import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key, required this.title}) : super(key: key);
@@ -15,32 +16,32 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreen extends State<SettingsScreen> {
-  int periodicityCheckInHours = 1;
+  int notificationTempo = 60;
 
-  void _showIntegerDialog(String care) async {
+  void _showIntegerDialog() async {
     FocusManager.instance.primaryFocus?.unfocus();
     await showDialog<int>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text("Select hours"),
-            content: StatefulBuilder(builder: (context, SBsetState) {
+            title: Text(AppLocalizations.of(context)!.selectHours),
+            content: StatefulBuilder(builder: (context, builderState) {
               return NumberPicker(
                   selectedTextStyle: const TextStyle(color: Colors.teal),
-                  value: periodicityCheckInHours,
+                  value: (notificationTempo / 60).round(),
                   minValue: 1,
                   maxValue: 24,
                   onChanged: (value) {
                     setState(() {
-                      periodicityCheckInHours = value;
+                      notificationTempo = value * 60;
                     });
-                    SBsetState(() => periodicityCheckInHours =
-                        value); //* to change on dialog state
+                    builderState(() => notificationTempo =
+                        value * 60); //* to change on dialog state
                   });
             }),
             actions: [
               TextButton(
-                child: const Text("OK"),
+                child: Text(AppLocalizations.of(context)!.ok),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -50,9 +51,17 @@ class _SettingsScreen extends State<SettingsScreen> {
         });
   }
 
+  Future<void> getSharedPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      notificationTempo = prefs.getInt('notificationTempo') ?? 60;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    getSharedPrefs();
   }
 
   @override
@@ -64,8 +73,11 @@ class _SettingsScreen extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 70,
         automaticallyImplyLeading: false,
-        title: const Text('Settings'),
+        title: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Text(AppLocalizations.of(context)!.tooltipSettings)),
         elevation: 0.0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
@@ -92,30 +104,33 @@ class _SettingsScreen extends State<SettingsScreen> {
                   ListTile(
                       trailing: const Icon(Icons.arrow_right),
                       leading: const Icon(Icons.alarm, color: Colors.blue),
-                      title: const Text('Notify every'),
-                      subtitle: periodicityCheckInHours != 0
-                          ? Text(periodicityCheckInHours.toString() + " hours")
-                          : const Text("Never"),
-
+                      title: Text(AppLocalizations.of(context)!.notifyEvery),
+                      subtitle: notificationTempo != 0
+                          ? Text((notificationTempo / 60).round().toString() +
+                              " ${AppLocalizations.of(context)!.hours}")
+                          : Text(AppLocalizations.of(context)!.never),
                       onTap: () {
-                        _showIntegerDialog("water");
+                        _showIntegerDialog();
                       }),
-            ListTile(
-              leading: Icon(Icons.info_outline_rounded),
-              subtitle: Transform.translate(
-                offset: Offset(-10, -5),
-                child: Text('The notification time will be reset when you enter the App.'
-                    '\n\nPlease note that some devices perform very aggressive battery optimizations that may cause notifications to not be issued correctly.'),
-              ),
-            ),
+                  ListTile(
+                    leading: const Icon(Icons.info_outline_rounded),
+                    subtitle: Transform.translate(
+                      offset: const Offset(-10, -5),
+                      child:
+                          Text(AppLocalizations.of(context)!.notificationInfo),
+                    ),
+                  ),
                   ListTile(
                       trailing: const Icon(Icons.arrow_right),
                       leading: const Icon(Icons.circle_notifications,
                           color: Colors.red),
-                      title: const Text('Test notification'),
+                      title: Text(
+                          AppLocalizations.of(context)!.testNotificationButton),
                       onTap: () {
-                        notify.singleNotification("Florae Test Notification",
-                            "This is a test message", 2);
+                        notify.singleNotification(
+                            AppLocalizations.of(context)!.testNotificationTitle,
+                            AppLocalizations.of(context)!.testNotificationBody,
+                            2);
                       }),
                 ]),
               ),
@@ -131,7 +146,8 @@ class _SettingsScreen extends State<SettingsScreen> {
                         trailing: const Icon(Icons.arrow_right),
                         leading: const Icon(Icons.text_snippet,
                             color: Colors.lightGreen),
-                        title: const Text('About Florae'),
+                        title: Text(
+                            AppLocalizations.of(context)!.aboutFloraeButton),
                         onTap: () {
                           showAboutDialog(
                             context: context,
@@ -148,9 +164,11 @@ class _SettingsScreen extends State<SettingsScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('notificationTempo', notificationTempo);
           Navigator.pop(context);
         },
-        label: const Text('Save'),
+        label: Text(AppLocalizations.of(context)!.saveButton),
         icon: const Icon(Icons.save),
         backgroundColor: Colors.teal,
       ),

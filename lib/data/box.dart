@@ -1,5 +1,4 @@
 import 'package:florae/data/plant.dart';
-import 'package:objectbox/objectbox.dart';
 import '../objectbox.g.dart';
 
 class ObjectBox {
@@ -24,8 +23,7 @@ class ObjectBox {
     return ObjectBox._create(store);
   }
 
-  int addPlant(Plant plant) =>
-      store.box<Plant>().put(plant);
+  int addPlant(Plant plant) => store.box<Plant>().put(plant);
 
   Future<void> removePlant(Plant plant) =>
       store.runInTransactionAsync(TxMode.write, _removePlantInTx, plant.id);
@@ -38,8 +36,5 @@ class ObjectBox {
     // here. To keep it simple, this example just puts a single object.
 
     store.box<Plant>().remove(id);
-
   }
-
-
 }

@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:florae/data/plant.dart';
 import 'package:florae/notifications.dart' as notify;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:intl/intl.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
@@ -39,12 +43,12 @@ class _MyHomePageState extends State<MyHomePage> {
   DateTime _dateFilter = DateTime.now();
   int _selectedIndex = 0;
 
-  int _status = 0;
-
   @override
   void initState() {
     super.initState();
     _loadPlants();
+
+    initializeDateFormatting();
 
     initPlatformState();
   }
@@ -52,10 +56,16 @@ class _MyHomePageState extends State<MyHomePage> {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     // Configure BackgroundFetch.
+    final prefs = await SharedPreferences.getInstance();
+    final int? notificationTempo = prefs.getInt('notificationTempo');
+
+    notify.initNotifications(AppLocalizations.of(context)!.careNotificationName,
+        AppLocalizations.of(context)!.careNotificationDescription);
+
     try {
       var status = await BackgroundFetch.configure(
           BackgroundFetchConfig(
-              minimumFetchInterval: 60,
+              minimumFetchInterval: notificationTempo ?? 60,
               forceAlarmManager: false,
               stopOnTerminate: false,
               startOnBoot: true,
@@ -68,9 +78,6 @@ class _MyHomePageState extends State<MyHomePage> {
           _onBackgroundFetch,
           _onBackgroundFetchTimeout);
       print('[BackgroundFetch] configure success: $status');
-      setState(() {
-        _status = status;
-      });
     } on Exception catch (e) {
       print("[BackgroundFetch] configure ERROR: $e");
     }
@@ -102,14 +109,12 @@ class _MyHomePageState extends State<MyHomePage> {
       print("foreground florae detected plants " + plants.join(' '));
 
       if (plants.isNotEmpty) {
-        notify.singleNotification("Plants require care", plants.join(' '), 7);
+        notify.singleNotification(
+            AppLocalizations.of(context)!.careNotificationTitle,
+            plants.join(' '),
+            7);
       }
-
-      //notify.singleNotification("Florae", "Foreground notification", 7);
-
     }
-    // IMPORTANT:  You must signal completion of your fetch task or the OS can punish your app
-    // for taking too long in the background.
     BackgroundFetch.finish(taskId);
   }
 
@@ -133,26 +138,25 @@ class _MyHomePageState extends State<MyHomePage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Have you taken care of all the plants?'),
+          title: Text(AppLocalizations.of(context)!.careAll),
           content: SingleChildScrollView(
             child: ListBody(
-              children: const <Widget>[
-                Text(
-                    'This action will mark all plants as cared for today cycle.'),
+              children: <Widget>[
+                Text(AppLocalizations.of(context)!.careAllBody),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('No'),
+              child: Text(AppLocalizations.of(context)!.no),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Yes'),
-              onPressed: () {
-                _careAllPlants();
+              child: Text(AppLocalizations.of(context)!.yes),
+              onPressed: () async {
+                await _careAllPlants();
                 Navigator.of(context).pop();
               },
             ),
@@ -177,17 +181,21 @@ class _MyHomePageState extends State<MyHomePage> {
               alignment: Alignment.center,
               height: 250,
             ),
-            Text(
-              _selectedIndex == 0
-                  ? 'Yay! You don\'t have any pending plants to care'
-                  : 'The garden is empty, shall we plant something?',
-              style: const TextStyle(
-                fontFamily: 'NotoSans',
-                fontWeight: FontWeight.w500,
-                fontSize: 25,
-                color: Color(0x78000000),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              //apply padding to all four sides
+              child: Text(
+                _selectedIndex == 0
+                    ? AppLocalizations.of(context)!.mainNoCares
+                    : AppLocalizations.of(context)!.mainNoPlants,
+                style: const TextStyle(
+                  fontFamily: 'NotoSans',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 25,
+                  color: Color(0x78000000),
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -197,13 +205,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String titleSelector() {
     if (_dateFilterEnabled) {
-      return DateFormat('EEEE').format(_dateFilter) +
+      return DateFormat.EEEE(Localizations.localeOf(context).languageCode)
+              .format(_dateFilter) +
           " " +
           DateFormat('d').format(_dateFilter);
     } else if (_selectedIndex == 1) {
-      return "Garden";
+      return AppLocalizations.of(context)!.buttonGarden;
     } else {
-      return "Today";
+      return AppLocalizations.of(context)!.buttonToday;
     }
   }
 
@@ -215,12 +224,16 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+
+    String title = titleSelector();
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        toolbarHeight: 70,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: FittedBox(fit: BoxFit.fitWidth, child: Text(titleSelector())),
+        title: FittedBox(fit: BoxFit.fitWidth, child: Text(title)),
         titleTextStyle: const TextStyle(
             color: Colors.black54,
             fontSize: 40,
@@ -232,7 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: const Icon(Icons.checklist_rounded),
                   iconSize: 25,
                   color: Colors.black54,
-                  tooltip: 'Apply care to all plants',
+                  tooltip: AppLocalizations.of(context)!.tooltipCareAll,
                   onPressed: () {
                     _showWaterAllPlantsDialog();
                   },
@@ -243,7 +256,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: const Icon(Icons.calendar_today),
                   iconSize: 25,
                   color: Colors.black54,
-                  tooltip: 'Show Calendar',
+                  tooltip: AppLocalizations.of(context)!.tooltipShowCalendar,
                   onPressed: () async {
                     DateTime? result = await showDatePicker(
                         context: context,
@@ -267,7 +280,7 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.settings),
             iconSize: 25,
             color: Colors.black54,
-            tooltip: 'Settings',
+            tooltip: AppLocalizations.of(context)!.tooltipSettings,
             onPressed: () async {
               await Navigator.push(
                   context,
@@ -299,14 +312,14 @@ class _MyHomePageState extends State<MyHomePage> {
               children: _buildPlantCards(context) // Changed code
               ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.eco),
-            label: 'Today',
+            icon: const Icon(Icons.eco),
+            label: AppLocalizations.of(context)!.buttonToday,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.grass),
-            label: 'Garden',
+            icon: const Icon(Icons.grass),
+            label: AppLocalizations.of(context)!.buttonGarden,
           ),
         ],
         selectedItemColor: Colors.teal,
@@ -320,15 +333,15 @@ class _MyHomePageState extends State<MyHomePage> {
           await Navigator.push(
               context,
               MaterialPageRoute<void>(
-                builder: (context) =>
-                    const ManagePlantScreen(title: "Manage plant", update: false),
+                builder: (context) => const ManagePlantScreen(
+                    title: "Manage plant", update: false),
               ));
           setState(() {
             _selectedIndex = 1;
             _loadPlants();
           });
         },
-        tooltip: 'Add new plant',
+        tooltip: AppLocalizations.of(context)!.tooltipNewPlant,
         child: const Icon(Icons.add),
         backgroundColor: Colors.teal,
       ), // This trailing comma makes auto-formatting nicer for build methods.
@@ -382,12 +395,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     for (Plant p in allPlants) {
       for (Care c in p.cares) {
-        var daysSinceLastCare =
-            (dateCheck.compareTo(c.effected!) / 60 / 60 / 24).round();
-        if (daysSinceLastCare >= c.cycles) {
+        var daysSinceLastCare = dateCheck.difference(c.effected!).inDays;
+        if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles >= 0) {
           c.effected = DateTime.now();
-
-          objectbox.plantBox.put(p);
+          objectbox.careBox.put(c);
         }
       }
     }
@@ -399,7 +410,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _openPlant(Plant plant) async {
-    print(plant.name);
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -418,16 +428,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<Icon> _buildCares(BuildContext context, Plant plant) {
-    final ThemeData theme = Theme.of(context);
-
     List<Icon> list = [];
 
-    _cares[plant.name]!.forEach((key) {
+    for (var care in _cares[plant.name]!) {
       list.add(
-        Icon(DefaultValues.getCare(key)!.icon,
-            color: DefaultValues.getCare(key)!.color),
+        Icon(DefaultValues.getCare(context, care)!.icon,
+            color: DefaultValues.getCare(context, care)!.color),
       );
-    });
+    }
 
     return list;
   }
@@ -443,6 +451,9 @@ class _MyHomePageState extends State<MyHomePage> {
             await _openPlant(plant);
           },
           child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
             clipBehavior: Clip.antiAlias,
             elevation: 5,
             child: Column(
@@ -474,20 +485,21 @@ class _MyHomePageState extends State<MyHomePage> {
                             maxLines: 1,
                           ),
                         ),
-
                         const SizedBox(height: 6.0),
                         Text(
                           plant.description,
                           style: theme.textTheme.subtitle2,
                         ),
                         const SizedBox(height: 8.0),
-                        Container(
+                        SizedBox(
                             height: 20.0,
                             child: FittedBox(
                               alignment: Alignment.centerLeft,
-                              child: plant.cares.isNotEmpty ? Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: _buildCares(context, plant)) : null,
+                              child: plant.cares.isNotEmpty
+                                  ? Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: _buildCares(context, plant))
+                                  : null,
                             )),
                       ],
                     ),

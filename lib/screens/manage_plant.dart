@@ -7,7 +7,7 @@ import 'package:florae/main.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
-import 'package:objectbox/objectbox.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
@@ -78,8 +78,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text("Select days"),
-            content: StatefulBuilder(builder: (context, SBsetState) {
+            title: Text(AppLocalizations.of(context)!.selectDays),
+            content: StatefulBuilder(builder: (context, sbSetState) {
               return NumberPicker(
                   selectedTextStyle: const TextStyle(color: Colors.teal),
                   value: cares[care]!.cycles,
@@ -89,13 +89,13 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     setState(() {
                       cares[care]!.cycles = value;
                     });
-                    SBsetState(() => cares[care]!.cycles =
+                    sbSetState(() => cares[care]!.cycles =
                         value); //* to change on dialog state
                   });
             }),
             actions: [
               TextButton(
-                child: const Text("OK"),
+                child: Text(AppLocalizations.of(context)!.ok),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -130,32 +130,35 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
     }
 
-    // Filling in the empty cares
-    DefaultValues.getCares().forEach((key, value) {
-      if (cares[key] == null){
-       cares [key] =  Care(cycles: value.defaultCycles, effected: DateTime.now(), name: key);
-      }
-    });
-  }
 
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Filling in the empty cares
+    DefaultValues.getCares(context).forEach((key, value) {
+      if (cares[key] == null){
+        cares [key] =  Care(cycles: value.defaultCycles, effected: DateTime.now(), name: key);
+      }
+    });  }
   @override
   void dispose() {
     super.dispose();
   }
 
   List<ListTile> _buildCares(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
 
     List<ListTile> list = [];
 
-    DefaultValues.getCares().forEach((key, value) {
+    DefaultValues.getCares(context).forEach((key, value) {
       list.add(ListTile(
           trailing: const Icon(Icons.arrow_right),
           leading: Icon(value.icon, color: value.color),
-          title: Text('${value.translatedName} every'),
+          title: Text('${value.translatedName} ${AppLocalizations.of(context)!.every}'),
           subtitle: cares[key]!.cycles != 0
-              ? Text(cares[key]!.cycles.toString() + " days")
-              : const Text("Never"),
+              ? Text(cares[key]!.cycles.toString() + " ${AppLocalizations.of(context)!.days}")
+              : Text(AppLocalizations.of(context)!.never),
           onTap: () {
             _showIntegerDialog(key);
           }));
@@ -168,8 +171,9 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight : 70,
         automaticallyImplyLeading: false,
-        title: widget.update ? const Text('Edit plant') : const Text('New plant'),
+        title: FittedBox(fit: BoxFit.fitWidth, child: widget.update ? Text(AppLocalizations.of(context)!.titleEditPlant) : Text(AppLocalizations.of(context)!.titleNewPlant)),
         elevation: 0.0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
@@ -197,11 +201,11 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     const SizedBox(height: 10),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(20.0), //or 15.0
-                      child: Container(
+                      child: SizedBox(
                         height: 200,
                         child: _image == null
                             ? Image.asset(
-                                "assets/florae_avatar_${_prefNumber}.png",
+                                "assets/florae_avatar_$_prefNumber.png",
                                 // TODO: Adjust the box size (102)
                                 fit: BoxFit.fitWidth,
                               )
@@ -214,22 +218,22 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                       children: <Widget>[
                         IconButton(
                           onPressed: getImageFromCam,
-                          icon: Icon(Icons.add_a_photo),
-                          tooltip: "Get image from camera",
+                          icon: const Icon(Icons.add_a_photo),
+                          tooltip: AppLocalizations.of(context)!.tooltipCameraImage,
                         ),
                         IconButton(
                           onPressed: getPrefabImage,
-                          icon: Icon(Icons.refresh),
-                          tooltip: "Next default image",
+                          icon: const Icon(Icons.refresh),
+                          tooltip: AppLocalizations.of(context)!.tooltipNextAvatar
                         ),
                         IconButton(
                           onPressed: getImageFromGallery,
-                          icon: Icon(Icons.wallpaper),
-                          tooltip: "Get image from gallery",
+                          icon: const Icon(Icons.wallpaper),
+                          tooltip: AppLocalizations.of(context)!.tooltipGalleryImage,
                         )
                       ],
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                   ],
                 )),
               ),
@@ -253,27 +257,27 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                             return null;
                           }
                           if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
+                            return AppLocalizations.of(context)!.emptyError;
                           }
                           if (findPlant(value) != null) {
-                            return 'Plant name already exists';
+                            return AppLocalizations.of(context)!.conflictError;
                           }
                           return null;
                         },
                         cursorColor: Colors.teal,
                         maxLength: 20,
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.local_florist),
-                          labelText: 'Name',
-                          labelStyle: TextStyle(
+                        decoration: InputDecoration(
+                          icon: const Icon(Icons.local_florist),
+                          labelText: AppLocalizations.of(context)!.labelName,
+                          labelStyle: const TextStyle(
                             decorationColor: Colors.teal,
                           ),
                           fillColor: Colors.teal,
                           focusColor: Colors.teal,
                           hoverColor: Colors.teal,
-                          helperText: 'Ex: Pilea',
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(
+                          helperText: AppLocalizations.of(context)!.exampleName,
+                          enabledBorder: const UnderlineInputBorder(),
+                          focusedBorder: const UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.teal)),
                         ),
                       ),
@@ -286,17 +290,17 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         controller: descriptionController,
                         cursorColor: Colors.teal,
                         maxLength: 100,
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.topic),
-                          labelText: 'Description',
-                          labelStyle: TextStyle(
+                        decoration: InputDecoration(
+                          icon: const Icon(Icons.topic),
+                          labelText: AppLocalizations.of(context)!.labelDescription,
+                          labelStyle: const TextStyle(
                             decorationColor: Colors.teal,
                           ),
                           fillColor: Colors.teal,
                           focusColor: Colors.teal,
                           hoverColor: Colors.teal,
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(
+                          enabledBorder: const UnderlineInputBorder(),
+                          focusedBorder: const UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.teal)),
                         ),
                       ),
@@ -304,18 +308,18 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         controller: locationController,
                         cursorColor: Colors.teal,
                         maxLength: 20,
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.location_on),
-                          labelText: 'Location',
-                          labelStyle: TextStyle(
+                        decoration: InputDecoration(
+                          icon: const Icon(Icons.location_on),
+                          labelText: AppLocalizations.of(context)!.labelLocation,
+                          labelStyle: const TextStyle(
                             decorationColor: Colors.teal,
                           ),
                           fillColor: Colors.teal,
                           focusColor: Colors.teal,
                           hoverColor: Colors.teal,
-                          helperText: 'Ex: Courtyard',
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(
+                          helperText: AppLocalizations.of(context)!.exampleLocation,
+                          enabledBorder: const UnderlineInputBorder(),
+                          focusedBorder: const UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.teal)),
                         ),
                       ),
@@ -341,16 +345,16 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                 ),
                 child: ListTile(
                   trailing: const Icon(Icons.arrow_right),
-                  leading: Icon(Icons.cake),
+                  leading: const Icon(Icons.cake),
                   enabled: !widget.update,
-                  title: Text('Day planted'),
-                  subtitle: Text(DateFormat.yMMMMEEEEd().format(_planted)),
+                  title: Text(AppLocalizations.of(context)!.labelDayPlanted),
+                  subtitle: Text(DateFormat.yMMMMEEEEd(Localizations.localeOf(context).languageCode).format(_planted)),
                   onTap: () async {
                     DateTime? result = await showDatePicker(
                         context: context,
                         initialDate: DateTime.now(),
                         firstDate:
-                            DateTime.now().subtract(Duration(days: 1000)),
+                            DateTime.now().subtract(const Duration(days: 1000)),
                         lastDate: DateTime.now());
                     setState(() {
                       _planted = result ?? DateTime.now();
@@ -377,11 +381,11 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
             final newPlant = Plant(
                 id: widget.plant != null ? widget.plant!.id : 0,
                 name: nameController.text,
-                createdAt: DateTime.now(),
+                createdAt: _planted,
                 description: descriptionController.text,
                 picture: _image != null
                     ? fileName
-                    : "assets/florae_avatar_${_prefNumber}.png",
+                    : "assets/florae_avatar_$_prefNumber.png",
                 location: locationController.text);
 
             newPlant.cares.clear();
@@ -401,11 +405,11 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
             }
 
             objectbox.plantBox.put(newPlant);
-            print(newPlant);
+
             Navigator.popUntil(context, ModalRoute.withName('/'));
           }
         },
-        label: const Text('Save'),
+        label: Text(AppLocalizations.of(context)!.saveButton),
         icon: const Icon(Icons.save),
         backgroundColor: Colors.teal,
       ),

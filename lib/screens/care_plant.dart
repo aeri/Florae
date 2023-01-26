@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../data/default.dart';
 import '../main.dart';
 import 'manage_plant.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CarePlantScreen extends StatefulWidget {
   const CarePlantScreen({Key? key, required this.title}) : super(key: key);
@@ -17,7 +18,7 @@ class CarePlantScreen extends StatefulWidget {
 
 class _CarePlantScreen extends State<CarePlantScreen> {
   int periodityCheckInHours = 1;
-  Map<String, bool?> cares = {};
+  Map<Care, bool?> careCheck = {};
 
   @override
   void initState() {
@@ -29,26 +30,71 @@ class _CarePlantScreen extends State<CarePlantScreen> {
     super.dispose();
   }
 
-  int daysToCare(Care c) {
-    return c.cycles - DateTime.now().difference(c.effected!).inDays;
+  String buildCareMessage(int daysToCare) {
+
+    if (daysToCare == 0 ){
+      return AppLocalizations.of(context)!.now;
+    }
+    else if (daysToCare <0){
+      return "${AppLocalizations.of(context)!.daysLate} ${daysToCare.abs()} ${AppLocalizations.of(context)!.days}";
+    }
+    else{
+      return  "$daysToCare ${AppLocalizations.of(context)!.daysLeft}";
+    }
+
+
+  }
+
+  Future<void> _showDeletePlantDialog(Plant plant) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.deletePlantTitle),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    AppLocalizations.of(context)!.deletePlantBody),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.no),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.yes),
+              onPressed: () async {
+                await objectbox.removePlant(plant);
+                Navigator.popUntil(context, ModalRoute.withName('/'));
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   List<CheckboxListTile> _buildCares(BuildContext context, Plant plant) {
-    final ThemeData theme = Theme.of(context);
-
     return plant.cares.map((care) {
-      int dtc = daysToCare(care);
+      int daysToCare = care.cycles - DateTime.now().difference(care.effected!).inDays;
+      careCheck[care] = (daysToCare <= 0);
       return CheckboxListTile(
-        title: Text(DefaultValues.getCare(care.name)!.translatedName),
-        subtitle: Text((dtc <= 0) ? "Now" : "$dtc days left to ${care.name}"),
-        value: cares[care.name] ?? (dtc <= 0),
+        title: Text(DefaultValues.getCare(context,care.name)!.translatedName),
+        subtitle: Text(buildCareMessage(daysToCare)),
+        value: careCheck[care],
         onChanged: (bool? value) {
           setState(() {
-            cares[care.name] = value;
+            careCheck[care] = value;
           });
         },
-        secondary: Icon(DefaultValues.getCare(care.name)!.icon,
-            color: DefaultValues.getCare(care.name)!.color),
+        secondary: Icon(DefaultValues.getCare(context, care.name)!.icon,
+            color: DefaultValues.getCare(context, care.name)!.color),
       );
     }).toList();
   }
@@ -59,8 +105,9 @@ class _CarePlantScreen extends State<CarePlantScreen> {
 
     return Scaffold(
         appBar: AppBar(
+          toolbarHeight : 70,
           automaticallyImplyLeading: false,
-          title: Text(plant.name),
+          title: FittedBox(fit: BoxFit.fitWidth, child: Text(plant.name)),
           elevation: 0.0,
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
@@ -69,7 +116,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
               icon: const Icon(Icons.edit),
               iconSize: 25,
               color: Colors.black54,
-              tooltip: 'Edit this care to all plants',
+              tooltip: AppLocalizations.of(context)!.tooltipEdit,
               onPressed: () async {
                 await Navigator.push(
                     context,
@@ -102,7 +149,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                       child: Column(
                     children: <Widget>[
                       ClipRRect(
-                        child: Container(
+                        child: SizedBox(
                           height: 220,
                           child: plant.picture!.contains("assets/")
                               ? Image.asset(
@@ -129,18 +176,18 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                   ),
                   child: Column(children: <Widget>[
                     ListTile(
-                        leading: Icon(Icons.topic),
-                        title: Text('Description'),
+                        leading: const Icon(Icons.topic),
+                        title: Text(AppLocalizations.of(context)!.labelDescription),
                         subtitle: Text(plant.description)),
                     ListTile(
-                        leading: Icon(Icons.location_on),
-                        title: Text('Location'),
+                        leading: const Icon(Icons.location_on),
+                        title: Text(AppLocalizations.of(context)!.labelLocation),
                         subtitle: Text(plant.location ?? "")),
                     ListTile(
-                        leading: Icon(Icons.cake),
-                        title: Text('Day planted'),
+                        leading: const Icon(Icons.cake),
+                        title: Text(AppLocalizations.of(context)!.labelDayPlanted),
                         subtitle:
-                            Text(DateFormat.yMMMMd().format(plant.createdAt))),
+                            Text(DateFormat.yMMMMd(Localizations.localeOf(context).languageCode).format(plant.createdAt))),
                   ]),
                 ),
                 Card(
@@ -165,32 +212,30 @@ class _CarePlantScreen extends State<CarePlantScreen> {
               FloatingActionButton.extended(
                 heroTag: "delete",
                 onPressed: () async {
-                  await objectbox.removePlant(plant);
-                  Navigator.of(context).pop();
+                  await _showDeletePlantDialog(plant);
                 },
-                label: const Text('Delete'),
+                label: Text(AppLocalizations.of(context)!.deleteButton),
                 icon: const Icon(Icons.delete),
                 backgroundColor: Colors.redAccent,
               ),
               FloatingActionButton.extended(
                 heroTag: "care",
                 onPressed: () {
-                  if (!cares.containsValue(true)) {
+                  if (!careCheck.containsValue(true)) {
                     print("NO CARES");
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Select at least one care')));
+                        SnackBar(content: Text(AppLocalizations.of(context)!.noCaresError)));
                   } else {
-                    cares.forEach((key, value) {
-                      int careIndex = plant.cares
-                          .indexWhere((element) => element.name == key);
-                      plant.cares[careIndex].effected = DateTime.now();
-                    });
-                    objectbox.plantBox.put(plant);
+                    careCheck.forEach((key, value) {
+                      if (value == true){
+                        key.effected = DateTime.now();
+                        objectbox.careBox.put(key);
+                      }});
 
                     Navigator.of(context).pop();
                   }
                 },
-                label: const Text('Care'),
+                label: Text(AppLocalizations.of(context)!.careButton),
                 icon: const Icon(Icons.check),
                 backgroundColor: Colors.greenAccent,
               )

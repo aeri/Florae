@@ -298,16 +298,19 @@ class _MyHomePageState extends State<MyHomePage> {
       body: _plants.isEmpty
           ? noPlants()
           : ResponsiveGridList(
-              horizontalGridSpacing: 10,
               // Horizontal space between grid items
-              horizontalGridMargin: 10,
+              horizontalGridSpacing: 10,
+              // Vertical space between grid items
+              verticalGridSpacing: 10,
               // Horizontal space around the grid
-              verticalGridMargin: 10,
+              horizontalGridMargin: 10,
               // Vertical space around the grid
-              minItemWidth: 300,
+              verticalGridMargin: 10,
               // The minimum item width (can be smaller, if the layout constraints are smaller)
-              minItemsPerRow: 2,
+              minItemWidth: 300,
               // The minimum items to show in a single row. Takes precedence over minItemWidth
+              minItemsPerRow: 2,
+              // The maximum items to show in a single row. Can be useful on large screens
               maxItemsPerRow: 2,
               children: _buildPlantCards(context) // Changed code
               ),

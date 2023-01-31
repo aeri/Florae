@@ -13,7 +13,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 
 class ManagePlantScreen extends StatefulWidget {
-  const ManagePlantScreen({Key? key, required this.title, required this.update, this.plant}) : super(key: key);
+  const ManagePlantScreen(
+      {Key? key, required this.title, required this.update, this.plant})
+      : super(key: key);
 
   final String title;
   final bool update;
@@ -24,7 +26,6 @@ class ManagePlantScreen extends StatefulWidget {
 }
 
 class _ManagePlantScreen extends State<ManagePlantScreen> {
-
   Map<String, Care> cares = {};
 
   DateTime _planted = DateTime.now();
@@ -111,53 +112,55 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     _loadPlants();
 
     // If is an update, restore old cares
-    if (widget.update && widget.plant != null){
+    if (widget.update && widget.plant != null) {
       for (var care in widget.plant!.cares) {
-        cares[care.name] = Care(name: care.name, cycles: care.cycles, effected: care.effected);
+        cares[care.name] =
+            Care(name: care.name, cycles: care.cycles, effected: care.effected);
       }
       nameController.text = widget.plant!.name;
       descriptionController.text = widget.plant!.description;
       locationController.text = widget.plant!.location ?? "";
 
-
-      if (widget.plant!.picture!.contains("florae_avatar")){
-        String? asset = widget.plant!.picture!.replaceAll(RegExp(r'[^0-9]'),''); // '23'
+      if (widget.plant!.picture!.contains("florae_avatar")) {
+        String? asset =
+            widget.plant!.picture!.replaceAll(RegExp(r'[^0-9]'), ''); // '23'
         _prefNumber = int.tryParse(asset) ?? 1;
-      }
-      else{
+      } else {
         _image = XFile(widget.plant!.picture!);
       }
-
     }
-
-
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     // Filling in the empty cares
     DefaultValues.getCares(context).forEach((key, value) {
-      if (cares[key] == null){
-        cares [key] =  Care(cycles: value.defaultCycles, effected: DateTime.now(), name: key);
+      if (cares[key] == null) {
+        cares[key] = Care(
+            cycles: value.defaultCycles, effected: DateTime.now(), name: key);
       }
-    });  }
+    });
+  }
+
   @override
   void dispose() {
     super.dispose();
   }
 
   List<ListTile> _buildCares(BuildContext context) {
-
     List<ListTile> list = [];
 
     DefaultValues.getCares(context).forEach((key, value) {
       list.add(ListTile(
           trailing: const Icon(Icons.arrow_right),
           leading: Icon(value.icon, color: value.color),
-          title: Text('${value.translatedName} ${AppLocalizations.of(context)!.every}'),
+          title: Text(
+              '${value.translatedName} ${AppLocalizations.of(context)!.every}'),
           subtitle: cares[key]!.cycles != 0
-              ? Text(cares[key]!.cycles.toString() + " ${AppLocalizations.of(context)!.days}")
+              ? Text(cares[key]!.cycles.toString() +
+                  " ${AppLocalizations.of(context)!.days}")
               : Text(AppLocalizations.of(context)!.never),
           onTap: () {
             _showIntegerDialog(key);
@@ -171,9 +174,13 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight : 70,
+        toolbarHeight: 70,
         automaticallyImplyLeading: false,
-        title: FittedBox(fit: BoxFit.fitWidth, child: widget.update ? Text(AppLocalizations.of(context)!.titleEditPlant) : Text(AppLocalizations.of(context)!.titleNewPlant)),
+        title: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: widget.update
+                ? Text(AppLocalizations.of(context)!.titleEditPlant)
+                : Text(AppLocalizations.of(context)!.titleNewPlant)),
         elevation: 0.0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
@@ -219,17 +226,19 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         IconButton(
                           onPressed: getImageFromCam,
                           icon: const Icon(Icons.add_a_photo),
-                          tooltip: AppLocalizations.of(context)!.tooltipCameraImage,
+                          tooltip:
+                              AppLocalizations.of(context)!.tooltipCameraImage,
                         ),
                         IconButton(
-                          onPressed: getPrefabImage,
-                          icon: const Icon(Icons.refresh),
-                          tooltip: AppLocalizations.of(context)!.tooltipNextAvatar
-                        ),
+                            onPressed: getPrefabImage,
+                            icon: const Icon(Icons.refresh),
+                            tooltip: AppLocalizations.of(context)!
+                                .tooltipNextAvatar),
                         IconButton(
                           onPressed: getImageFromGallery,
                           icon: const Icon(Icons.wallpaper),
-                          tooltip: AppLocalizations.of(context)!.tooltipGalleryImage,
+                          tooltip:
+                              AppLocalizations.of(context)!.tooltipGalleryImage,
                         )
                       ],
                     ),
@@ -253,7 +262,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         controller: nameController,
                         enabled: !widget.update,
                         validator: (value) {
-                          if (widget.update){
+                          if (widget.update) {
                             return null;
                           }
                           if (value == null || value.isEmpty) {
@@ -292,7 +301,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         maxLength: 100,
                         decoration: InputDecoration(
                           icon: const Icon(Icons.topic),
-                          labelText: AppLocalizations.of(context)!.labelDescription,
+                          labelText:
+                              AppLocalizations.of(context)!.labelDescription,
                           labelStyle: const TextStyle(
                             decorationColor: Colors.teal,
                           ),
@@ -310,14 +320,16 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         maxLength: 20,
                         decoration: InputDecoration(
                           icon: const Icon(Icons.location_on),
-                          labelText: AppLocalizations.of(context)!.labelLocation,
+                          labelText:
+                              AppLocalizations.of(context)!.labelLocation,
                           labelStyle: const TextStyle(
                             decorationColor: Colors.teal,
                           ),
                           fillColor: Colors.teal,
                           focusColor: Colors.teal,
                           hoverColor: Colors.teal,
-                          helperText: AppLocalizations.of(context)!.exampleLocation,
+                          helperText:
+                              AppLocalizations.of(context)!.exampleLocation,
                           enabledBorder: const UnderlineInputBorder(),
                           focusedBorder: const UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.teal)),
@@ -348,7 +360,9 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                   leading: const Icon(Icons.cake),
                   enabled: !widget.update,
                   title: Text(AppLocalizations.of(context)!.labelDayPlanted),
-                  subtitle: Text(DateFormat.yMMMMEEEEd(Localizations.localeOf(context).languageCode).format(_planted)),
+                  subtitle: Text(DateFormat.yMMMMEEEEd(
+                          Localizations.localeOf(context).languageCode)
+                      .format(_planted)),
                   onTap: () async {
                     DateTime? result = await showDatePicker(
                         context: context,
@@ -399,7 +413,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
             // ObjectBox does not track ToMany changes
             // https://github.com/objectbox/objectbox-dart/issues/326
-            if (widget.update && widget.plant != null){
+            if (widget.update && widget.plant != null) {
               widget.plant!.cares.clear();
               objectbox.plantBox.put(widget.plant!);
             }

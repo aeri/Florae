@@ -83,11 +83,10 @@ class _CarePlantScreen extends State<CarePlantScreen> {
   List<CheckboxListTile> _buildCares(BuildContext context, Plant plant) {
     return plant.cares.map((care) {
       int daysToCare = care.cycles - DateTime.now().difference(care.effected!).inDays;
-      careCheck[care] = (daysToCare <= 0);
       return CheckboxListTile(
         title: Text(DefaultValues.getCare(context,care.name)!.translatedName),
         subtitle: Text(buildCareMessage(daysToCare)),
-        value: careCheck[care],
+        value: careCheck[care] ?? (daysToCare <= 0),
         onChanged: (bool? value) {
           setState(() {
             careCheck[care] = value;

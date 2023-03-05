@@ -370,12 +370,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
           // If calendar day selected, add only the care that must be attended on a certain day.
           // Past care is assumed to have been correctly attended to in due time.
-          if (_dateFilterEnabled){
-            requiresInsert = daysSinceLastCare != 0 && daysSinceLastCare % c.cycles == 0;
+          if (_dateFilterEnabled) {
+            requiresInsert =
+                daysSinceLastCare != 0 && daysSinceLastCare % c.cycles == 0;
           }
           // Else, add all unattended care, current and past
-          else{
-            requiresInsert = daysSinceLastCare != 0 && daysSinceLastCare / c.cycles >= 1;
+          else {
+            requiresInsert =
+                daysSinceLastCare != 0 && daysSinceLastCare / c.cycles >= 1;
           }
           if (requiresInsert) {
             if (!inserted) {

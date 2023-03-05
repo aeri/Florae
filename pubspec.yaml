@@ -34,16 +34,23 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  sembast: ^3.1.2
-  path_provider: ^2.0.9
-  get_it: ^7.2.0
-  image_picker: ^0.8.4+9
-  numberpicker: ^2.0.1
-  flutter_svg: ^1.0.3
+  objectbox: ^1.7.0
+  objectbox_flutter_libs: any
+  path_provider: ^2.0.12
+  image_picker: ^0.8.5+3
+  numberpicker: ^2.1.1
+  flutter_svg: ^1.1.6
   intl: ^0.17.0
-  android_alarm_manager_plus: ^2.0.5
-  flutter_local_notifications: ^9.3.2
+  flutter_localizations:
+    sdk: flutter
+  background_fetch: ^1.1.4
+  flutter_local_notifications: ^9.9.1
+  shared_preferences: ^2.0.17
+  responsive_grid_list: ^1.3.0
+
 dev_dependencies:
+  build_runner: ^2.0.0
+  objectbox_generator: any
   flutter_test:
     sdk: flutter
 
@@ -59,7 +66,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
+  generate: true
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -71,14 +78,16 @@ flutter:
     - assets/undraw_fall_thyk.svg
     - assets/undraw_gardening_re_e658.svg
     - assets/undraw_flowers_vx06.svg
-    - assets/florae_avatar (1).png
-    - assets/florae_avatar (2).png
-    - assets/florae_avatar (3).png
-    - assets/florae_avatar (4).png
-    - assets/florae_avatar (5).png
-    - assets/florae_avatar (6).png
-    - assets/florae_avatar (7).png
-    - assets/florae_avatar (8).png
+    - assets/undraw_blooming_re_2kc4.svg
+    - assets/undraw_different_love_a-3-rg.svg
+    - assets/florae_avatar_1.png
+    - assets/florae_avatar_2.png
+    - assets/florae_avatar_3.png
+    - assets/florae_avatar_4.png
+    - assets/florae_avatar_5.png
+    - assets/florae_avatar_6.png
+    - assets/florae_avatar_7.png
+    - assets/florae_avatar_8.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

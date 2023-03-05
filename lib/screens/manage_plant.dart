@@ -1,21 +1,25 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:florae/data/default.dart';
 import 'package:florae/data/plant.dart';
-import 'package:florae/data/plant_repository.dart';
+import 'package:florae/main.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'package:get_it/get_it.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sembast/timestamp.dart';
 import 'package:intl/intl.dart';
 
 class ManagePlantScreen extends StatefulWidget {
-  const ManagePlantScreen({Key? key, required this.title}) : super(key: key);
+  const ManagePlantScreen(
+      {Key? key, required this.title, required this.update, this.plant})
+      : super(key: key);
 
   final String title;
+  final bool update;
+  final Plant? plant;
 
   @override
   State<ManagePlantScreen> createState() => _ManagePlantScreen();
@@ -25,7 +29,6 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   Map<String, Care> cares = {};
 
   DateTime _planted = DateTime.now();
-  final PlantRepository _plantRepository = GetIt.I.get();
 
   List<Plant> _plants = [];
 
@@ -76,8 +79,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text("Select days"),
-            content: StatefulBuilder(builder: (context, SBsetState) {
+            title: Text(AppLocalizations.of(context)!.selectDays),
+            content: StatefulBuilder(builder: (context, sbSetState) {
               return NumberPicker(
                   selectedTextStyle: const TextStyle(color: Colors.teal),
                   value: cares[care]!.cycles,
@@ -87,13 +90,13 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     setState(() {
                       cares[care]!.cycles = value;
                     });
-                    SBsetState(() => cares[care]!.cycles =
+                    sbSetState(() => cares[care]!.cycles =
                         value); //* to change on dialog state
                   });
             }),
             actions: [
               TextButton(
-                child: const Text("OK"),
+                child: Text(AppLocalizations.of(context)!.ok),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -108,15 +111,37 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     super.initState();
     _loadPlants();
 
-    Timestamp init = Timestamp.fromDateTime(
-        DateTime.now().subtract(const Duration(minutes: 5)));
-    cares["water"] = Care(cycles: 1, effected: init);
-    cares["rotate"] = Care(cycles: 0, effected: init);
-    cares["spray"] = Care(cycles: 0, effected: init);
-    cares["prune"] = Care(cycles: 0, effected: init);
-    cares["fertilise"] = Care(cycles: 0, effected: init);
-    cares["transplant"] = Care(cycles: 0, effected: init);
-    cares["clean"] = Care(cycles: 0, effected: init);
+    // If is an update, restore old cares
+    if (widget.update && widget.plant != null) {
+      for (var care in widget.plant!.cares) {
+        cares[care.name] =
+            Care(name: care.name, cycles: care.cycles, effected: care.effected);
+      }
+      nameController.text = widget.plant!.name;
+      descriptionController.text = widget.plant!.description;
+      locationController.text = widget.plant!.location ?? "";
+
+      if (widget.plant!.picture!.contains("florae_avatar")) {
+        String? asset =
+            widget.plant!.picture!.replaceAll(RegExp(r'[^0-9]'), ''); // '23'
+        _prefNumber = int.tryParse(asset) ?? 1;
+      } else {
+        _image = XFile(widget.plant!.picture!);
+      }
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Filling in the empty cares
+    DefaultValues.getCares(context).forEach((key, value) {
+      if (cares[key] == null) {
+        cares[key] = Care(
+            cycles: value.defaultCycles, effected: DateTime.now(), name: key);
+      }
+    });
   }
 
   @override
@@ -124,12 +149,39 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     super.dispose();
   }
 
+  List<ListTile> _buildCares(BuildContext context) {
+    List<ListTile> list = [];
+
+    DefaultValues.getCares(context).forEach((key, value) {
+      list.add(ListTile(
+          trailing: const Icon(Icons.arrow_right),
+          leading: Icon(value.icon, color: value.color),
+          title: Text(
+              '${value.translatedName} ${AppLocalizations.of(context)!.every}'),
+          subtitle: cares[key]!.cycles != 0
+              ? Text(cares[key]!.cycles.toString() +
+                  " ${AppLocalizations.of(context)!.days}")
+              : Text(AppLocalizations.of(context)!.never),
+          onTap: () {
+            _showIntegerDialog(key);
+          }));
+    });
+
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 70,
         automaticallyImplyLeading: false,
-        title: const Text('New plant'),
+        title: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: widget.update
+                ? Text(AppLocalizations.of(context)!.titleEditPlant)
+                : Text(AppLocalizations.of(context)!.titleNewPlant)),
+        elevation: 0.0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
         titleTextStyle: const TextStyle(
@@ -156,11 +208,11 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     const SizedBox(height: 10),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(20.0), //or 15.0
-                      child: Container(
+                      child: SizedBox(
                         height: 200,
                         child: _image == null
                             ? Image.asset(
-                                "assets/florae_avatar (${_prefNumber}).png",
+                                "assets/florae_avatar_$_prefNumber.png",
                                 // TODO: Adjust the box size (102)
                                 fit: BoxFit.fitWidth,
                               )
@@ -173,22 +225,24 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                       children: <Widget>[
                         IconButton(
                           onPressed: getImageFromCam,
-                          icon: Icon(Icons.add_a_photo),
-                          tooltip: "Get image from camera",
+                          icon: const Icon(Icons.add_a_photo),
+                          tooltip:
+                              AppLocalizations.of(context)!.tooltipCameraImage,
                         ),
                         IconButton(
-                          onPressed: getPrefabImage,
-                          icon: Icon(Icons.refresh),
-                          tooltip: "Next default image",
-                        ),
+                            onPressed: getPrefabImage,
+                            icon: const Icon(Icons.refresh),
+                            tooltip: AppLocalizations.of(context)!
+                                .tooltipNextAvatar),
                         IconButton(
                           onPressed: getImageFromGallery,
-                          icon: Icon(Icons.wallpaper),
-                          tooltip: "Get image from gallery",
+                          icon: const Icon(Icons.wallpaper),
+                          tooltip:
+                              AppLocalizations.of(context)!.tooltipGalleryImage,
                         )
                       ],
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                   ],
                 )),
               ),
@@ -206,29 +260,33 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     child: Column(children: <Widget>[
                       TextFormField(
                         controller: nameController,
+                        enabled: !widget.update,
                         validator: (value) {
+                          if (widget.update) {
+                            return null;
+                          }
                           if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
+                            return AppLocalizations.of(context)!.emptyError;
                           }
                           if (findPlant(value) != null) {
-                            return 'Plant name already exists';
+                            return AppLocalizations.of(context)!.conflictError;
                           }
                           return null;
                         },
                         cursorColor: Colors.teal,
                         maxLength: 20,
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.local_florist),
-                          labelText: 'Name',
-                          labelStyle: TextStyle(
+                        decoration: InputDecoration(
+                          icon: const Icon(Icons.local_florist),
+                          labelText: AppLocalizations.of(context)!.labelName,
+                          labelStyle: const TextStyle(
                             decorationColor: Colors.teal,
                           ),
                           fillColor: Colors.teal,
                           focusColor: Colors.teal,
                           hoverColor: Colors.teal,
-                          helperText: 'Ex: Pilea',
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(
+                          helperText: AppLocalizations.of(context)!.exampleName,
+                          enabledBorder: const UnderlineInputBorder(),
+                          focusedBorder: const UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.teal)),
                         ),
                       ),
@@ -241,17 +299,18 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         controller: descriptionController,
                         cursorColor: Colors.teal,
                         maxLength: 100,
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.topic),
-                          labelText: 'Description',
-                          labelStyle: TextStyle(
+                        decoration: InputDecoration(
+                          icon: const Icon(Icons.topic),
+                          labelText:
+                              AppLocalizations.of(context)!.labelDescription,
+                          labelStyle: const TextStyle(
                             decorationColor: Colors.teal,
                           ),
                           fillColor: Colors.teal,
                           focusColor: Colors.teal,
                           hoverColor: Colors.teal,
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(
+                          enabledBorder: const UnderlineInputBorder(),
+                          focusedBorder: const UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.teal)),
                         ),
                       ),
@@ -259,21 +318,23 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         controller: locationController,
                         cursorColor: Colors.teal,
                         maxLength: 20,
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.location_on),
-                          labelText: 'Location',
-                          labelStyle: TextStyle(
+                        decoration: InputDecoration(
+                          icon: const Icon(Icons.location_on),
+                          labelText:
+                              AppLocalizations.of(context)!.labelLocation,
+                          labelStyle: const TextStyle(
                             decorationColor: Colors.teal,
                           ),
                           fillColor: Colors.teal,
                           focusColor: Colors.teal,
                           hoverColor: Colors.teal,
-                          helperText: 'Ex: Courtyard',
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(
+                          helperText:
+                              AppLocalizations.of(context)!.exampleLocation,
+                          enabledBorder: const UnderlineInputBorder(),
+                          focusedBorder: const UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.teal)),
                         ),
-                      )
+                      ),
                     ]),
                   ),
                 ),
@@ -285,109 +346,35 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
-                child: Column(children: <Widget>[
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.opacity, color: Colors.blue),
-                      title: const Text('Water every'),
-                      subtitle: cares["water"]!.cycles != 0
-                          ? Text(cares["water"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("water");
-                      }),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.air, color: Colors.lightGreen),
-                      title: const Text('Spray every'),
-                      subtitle: cares["spray"]!.cycles != 0
-                          ? Text(cares["spray"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("spray");
-                      }),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.rotate_90_degrees_ccw,
-                          color: Colors.purple),
-                      title: const Text('Rotate every'),
-                      subtitle: cares["rotate"]!.cycles != 0
-                          ? Text(cares["rotate"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("rotate");
-                      }),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.cut, color: Colors.orange),
-                      title: const Text('Pruning every'),
-                      subtitle: cares["prune"]!.cycles != 0
-                          ? Text(cares["prune"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("prune");
-                      }),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.workspaces_filled,
-                          color: Colors.brown),
-                      title: const Text('Fertilise every'),
-                      subtitle: cares["fertilise"]!.cycles != 0
-                          ? Text(
-                              cares["fertilise"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("fertilise");
-                      }),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.published_with_changes,
-                          color: Colors.green),
-                      title: const Text('Transplant every'),
-                      subtitle: cares["transplant"]!.cycles != 0
-                          ? Text(
-                              cares["transplant"]!.cycles.toString() + " days")
-                          : const Text("Never"),
-                      onTap: () {
-                        _showIntegerDialog("transplant");
-                      }),
-                  ListTile(
-                    trailing: const Icon(Icons.arrow_right),
-                    leading: const Icon(Icons.cleaning_services,
-                        color: Colors.blueGrey),
-                    title: const Text('Clean every'),
-                    subtitle: cares["clean"]!.cycles != 0
-                        ? Text(cares["clean"]!.cycles.toString() + " days")
-                        : const Text("Never"),
-                    onTap: () {
-                      _showIntegerDialog("clean");
-                    },
-                  ),
-                  ListTile(
-                    trailing: const Icon(Icons.arrow_right),
-                    leading: Icon(Icons.cake),
-                    title: Text('Day planted'),
-                    subtitle: Text(DateFormat.yMMMMEEEEd().format(_planted)),
-                    onTap: () async {
-                      DateTime? result = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate:
-                              DateTime.now().subtract(Duration(days: 1000)),
-                          lastDate: DateTime.now());
-                      setState(() {
-                        _planted = result ?? DateTime.now();
-                      });
-                    },
-                  ),
-                  /*
-                  const ListTile(
-                    leading: Icon(Icons.group),
-                    title: Text('Contact group'),
-                    subtitle: Text('Not specified'),
-                  ),
-                   */
-                ]),
+                child: Column(children: _buildCares(context)),
+              ),
+              Card(
+                semanticContainer: true,
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: ListTile(
+                  trailing: const Icon(Icons.arrow_right),
+                  leading: const Icon(Icons.cake),
+                  enabled: !widget.update,
+                  title: Text(AppLocalizations.of(context)!.labelDayPlanted),
+                  subtitle: Text(DateFormat.yMMMMEEEEd(
+                          Localizations.localeOf(context).languageCode)
+                      .format(_planted)),
+                  onTap: () async {
+                    DateTime? result = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate:
+                            DateTime.now().subtract(const Duration(days: 1000)),
+                        lastDate: DateTime.now());
+                    setState(() {
+                      _planted = result ?? DateTime.now();
+                    });
+                  },
+                ),
               ),
               const SizedBox(height: 70),
             ],
@@ -404,21 +391,39 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               fileName = directory.path + "/" + generateRandomString(10);
               _image!.saveTo(fileName);
             }
+
             final newPlant = Plant(
+                id: widget.plant != null ? widget.plant!.id : 0,
                 name: nameController.text,
-                cares: cares,
-                createdAt: Timestamp.now(),
+                createdAt: _planted,
                 description: descriptionController.text,
                 picture: _image != null
                     ? fileName
-                    : "assets/florae_avatar (${_prefNumber}).png",
+                    : "assets/florae_avatar_$_prefNumber.png",
                 location: locationController.text);
-            final plant = await _plantRepository.insertPlant(newPlant);
-            print(plant);
-            Navigator.pop(context);
+
+            newPlant.cares.clear();
+
+            cares.forEach((key, value) {
+              if (value.cycles != 0) {
+                newPlant.cares.add(Care(
+                    cycles: value.cycles, effected: value.effected, name: key));
+              }
+            });
+
+            // ObjectBox does not track ToMany changes
+            // https://github.com/objectbox/objectbox-dart/issues/326
+            if (widget.update && widget.plant != null) {
+              widget.plant!.cares.clear();
+              objectbox.plantBox.put(widget.plant!);
+            }
+
+            objectbox.plantBox.put(newPlant);
+
+            Navigator.popUntil(context, ModalRoute.withName('/'));
           }
         },
-        label: const Text('Save'),
+        label: Text(AppLocalizations.of(context)!.saveButton),
         icon: const Icon(Icons.save),
         backgroundColor: Colors.teal,
       ),
@@ -432,8 +437,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   }
 
   _loadPlants() async {
-    final plants = await _plantRepository.getAllPlants();
-    setState(() => _plants = plants);
+    List<Plant> allPlants = objectbox.plantBox.getAll();
+    setState(() => _plants = allPlants);
   }
 
   Plant? findPlant(String name) => _plants

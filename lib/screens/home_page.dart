@@ -1,13 +1,22 @@
 import 'dart:io';
 
-import 'package:florae/data/plant_repository.dart';
+import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get_it/get_it.dart';
 import 'package:florae/data/plant.dart';
+import 'package:florae/notifications.dart' as notify;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:intl/intl.dart';
-import 'package:sembast/timestamp.dart';
+import 'package:responsive_grid_list/responsive_grid_list.dart';
+import '../data/default.dart';
+import '../main.dart';
 import 'manage_plant.dart';
+import 'care_plant.dart';
+import 'settings.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -28,8 +37,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final PlantRepository _plantRepository = GetIt.I.get();
   List<Plant> _plants = [];
+  Map<String, List<String>> _cares = {};
   bool _dateFilterEnabled = false;
   DateTime _dateFilter = DateTime.now();
   int _selectedIndex = 0;
@@ -38,6 +47,81 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _loadPlants();
+
+    initializeDateFormatting();
+
+    initPlatformState();
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    // Configure BackgroundFetch.
+    final prefs = await SharedPreferences.getInstance();
+    final int? notificationTempo = prefs.getInt('notificationTempo');
+
+    notify.initNotifications(AppLocalizations.of(context)!.careNotificationName,
+        AppLocalizations.of(context)!.careNotificationDescription);
+
+    try {
+      var status = await BackgroundFetch.configure(
+          BackgroundFetchConfig(
+              minimumFetchInterval: notificationTempo ?? 60,
+              forceAlarmManager: false,
+              stopOnTerminate: false,
+              startOnBoot: true,
+              enableHeadless: true,
+              requiresBatteryNotLow: false,
+              requiresCharging: false,
+              requiresStorageNotLow: false,
+              requiresDeviceIdle: false,
+              requiredNetworkType: NetworkType.NONE),
+          _onBackgroundFetch,
+          _onBackgroundFetchTimeout);
+      print('[BackgroundFetch] configure success: $status');
+    } on Exception catch (e) {
+      print("[BackgroundFetch] configure ERROR: $e");
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+  }
+
+  void _onBackgroundFetch(String taskId) async {
+    // This is the fetch-event callback.
+    print("[BackgroundFetch] Event received: $taskId");
+
+    if (taskId == "flutter_background_fetch") {
+      List<Plant> allPlants = objectbox.plantBox.getAll();
+      List<String> plants = [];
+
+      for (Plant p in allPlants) {
+        for (Care c in p.cares) {
+          var daysSinceLastCare = DateTime.now().difference(c.effected!).inDays;
+          if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles == 0) {
+            plants.add(p.name);
+          }
+          break;
+        }
+      }
+
+      print("foreground florae detected plants " + plants.join(' '));
+
+      if (plants.isNotEmpty) {
+        notify.singleNotification(
+            AppLocalizations.of(context)!.careNotificationTitle,
+            plants.join(' '),
+            7);
+      }
+    }
+    BackgroundFetch.finish(taskId);
+  }
+
+  /// This event fires shortly before your task is about to timeout.  You must finish any outstanding work and call BackgroundFetch.finish(taskId).
+  void _onBackgroundFetchTimeout(String taskId) {
+    print("[BackgroundFetch] TIMEOUT: $taskId");
+    BackgroundFetch.finish(taskId);
   }
 
   void _onItemTapped(int index) {
@@ -54,26 +138,25 @@ class _MyHomePageState extends State<MyHomePage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Have you watered all the plants?'),
+          title: Text(AppLocalizations.of(context)!.careAll),
           content: SingleChildScrollView(
             child: ListBody(
-              children: const <Widget>[
-                Text(
-                    'This action will mark all plants as watered for today cycle.'),
+              children: <Widget>[
+                Text(AppLocalizations.of(context)!.careAllBody),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('No'),
+              child: Text(AppLocalizations.of(context)!.no),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Yes'),
-              onPressed: () {
-                _waterAllPlants();
+              child: Text(AppLocalizations.of(context)!.yes),
+              onPressed: () async {
+                await _careAllPlants();
                 Navigator.of(context).pop();
               },
             ),
@@ -86,33 +169,33 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget noPlants() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(15.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SvgPicture.asset(
               _selectedIndex == 0
                   ? "assets/undraw_fall_thyk.svg"
-                  : "assets/undraw_gardening_re_e658.svg",
+                  : "assets/undraw_blooming_re_2kc4.svg",
               semanticsLabel: 'Fall',
               alignment: Alignment.center,
               height: 250,
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            Text(
-              _selectedIndex == 0
-                  ? 'Yay! You don\'t have any pending plants to water!'
-                  : 'The garden is empty, shall we plant something?',
-              style: const TextStyle(
-                fontFamily: 'NotoSans',
-                fontWeight: FontWeight.w500,
-                fontSize: 25,
-                color: Color(0x78000000),
-                height: 1.4285714285714286,
+            Padding(
+              padding: const EdgeInsets.all(10),
+              //apply padding to all four sides
+              child: Text(
+                _selectedIndex == 0
+                    ? AppLocalizations.of(context)!.mainNoCares
+                    : AppLocalizations.of(context)!.mainNoPlants,
+                style: const TextStyle(
+                  fontFamily: 'NotoSans',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 25,
+                  color: Color(0x78000000),
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -122,13 +205,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String titleSelector() {
     if (_dateFilterEnabled) {
-      return DateFormat('EEEE').format(_dateFilter) +
+      return DateFormat.EEEE(Localizations.localeOf(context).languageCode)
+              .format(_dateFilter) +
           " " +
           DateFormat('d').format(_dateFilter);
     } else if (_selectedIndex == 1) {
-      return "Garden";
+      return AppLocalizations.of(context)!.buttonGarden;
     } else {
-      return "Today";
+      return AppLocalizations.of(context)!.buttonToday;
     }
   }
 
@@ -140,12 +224,16 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+
+    String title = titleSelector();
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        toolbarHeight: 70,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: FittedBox(fit: BoxFit.fitWidth, child: Text(titleSelector())),
+        title: FittedBox(fit: BoxFit.fitWidth, child: Text(title)),
         titleTextStyle: const TextStyle(
             color: Colors.black54,
             fontSize: 40,
@@ -157,7 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: const Icon(Icons.checklist_rounded),
                   iconSize: 25,
                   color: Colors.black54,
-                  tooltip: 'Water all plants',
+                  tooltip: AppLocalizations.of(context)!.tooltipCareAll,
                   onPressed: () {
                     _showWaterAllPlantsDialog();
                   },
@@ -168,7 +256,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: const Icon(Icons.calendar_today),
                   iconSize: 25,
                   color: Colors.black54,
-                  tooltip: 'Show Calendar',
+                  tooltip: AppLocalizations.of(context)!.tooltipShowCalendar,
                   onPressed: () async {
                     DateTime? result = await showDatePicker(
                         context: context,
@@ -178,7 +266,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         lastDate: DateTime.now().add(const Duration(days: 7)));
                     setState(() {
                       if (result != null) {
-                        _dateFilter = result;
+                        var time = TimeOfDay.now();
+                        _dateFilter = result.add(
+                            Duration(hours: time.hour, minutes: time.minute));
                         _dateFilterEnabled = true;
                         _loadPlants();
                       }
@@ -190,8 +280,15 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.settings),
             iconSize: 25,
             color: Colors.black54,
-            tooltip: 'Settings',
-            onPressed: () async {},
+            tooltip: AppLocalizations.of(context)!.tooltipSettings,
+            onPressed: () async {
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (context) =>
+                        const SettingsScreen(title: "Settings Screen"),
+                  ));
+            },
           ),
         ],
         backgroundColor: Colors.transparent,
@@ -200,21 +297,32 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: _plants.isEmpty
           ? noPlants()
-          : GridView.count(
-              crossAxisCount: 2,
-              padding: const EdgeInsets.all(16.0),
-              childAspectRatio: 8.0 / 9.0,
-              children: _buildGridCards(context) // Changed code
+          : ResponsiveGridList(
+              // Horizontal space between grid items
+              horizontalGridSpacing: 10,
+              // Vertical space between grid items
+              verticalGridSpacing: 10,
+              // Horizontal space around the grid
+              horizontalGridMargin: 10,
+              // Vertical space around the grid
+              verticalGridMargin: 10,
+              // The minimum item width (can be smaller, if the layout constraints are smaller)
+              minItemWidth: 300,
+              // The minimum items to show in a single row. Takes precedence over minItemWidth
+              minItemsPerRow: 2,
+              // The maximum items to show in a single row. Can be useful on large screens
+              maxItemsPerRow: 2,
+              children: _buildPlantCards(context) // Changed code
               ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.eco),
-            label: 'Today',
+            icon: const Icon(Icons.eco),
+            label: AppLocalizations.of(context)!.buttonToday,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.grass),
-            label: 'Garden',
+            icon: const Icon(Icons.grass),
+            label: AppLocalizations.of(context)!.buttonGarden,
           ),
         ],
         selectedItemColor: Colors.teal,
@@ -228,15 +336,15 @@ class _MyHomePageState extends State<MyHomePage> {
           await Navigator.push(
               context,
               MaterialPageRoute<void>(
-                builder: (context) =>
-                    const ManagePlantScreen(title: "Manage plant"),
+                builder: (context) => const ManagePlantScreen(
+                    title: "Manage plant", update: false),
               ));
           setState(() {
             _selectedIndex = 1;
             _loadPlants();
           });
         },
-        tooltip: 'Add new plant',
+        tooltip: AppLocalizations.of(context)!.tooltipNewPlant,
         child: const Icon(Icons.add),
         backgroundColor: Colors.teal,
       ), // This trailing comma makes auto-formatting nicer for build methods.
@@ -245,91 +353,135 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _loadPlants() async {
     List<Plant> plants = [];
-    List<Plant> allPlants = await _plantRepository.getAllPlants();
-    Timestamp dateCheck = _dateFilterEnabled
-        ? Timestamp.fromDateTime(_dateFilter)
-        : Timestamp.now();
+    Map<String, List<String>> cares = {};
+
+    List<Plant> allPlants = objectbox.plantBox.getAll();
+
+    DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
+
+    bool inserted = false;
+    bool requiresInsert = false;
 
     if (_selectedIndex == 0) {
       for (Plant p in allPlants) {
-        var cpsr = (dateCheck.compareTo(p.cares["water"]!.effected!) / 60 / 60 / 24).round();
-        if (cpsr != 0 && cpsr % p.cares["water"]!.cycles == 0) {
-          plants.add(p);
+        cares[p.name] = [];
+        for (Care c in p.cares) {
+          var daysSinceLastCare = dateCheck.difference(c.effected!).inDays;
+
+          // If calendar day selected, add only the care that must be attended on a certain day.
+          // Past care is assumed to have been correctly attended to in due time.
+          if (_dateFilterEnabled){
+            requiresInsert = daysSinceLastCare != 0 && daysSinceLastCare % c.cycles == 0;
+          }
+          // Else, add all unattended care, current and past
+          else{
+            requiresInsert = daysSinceLastCare != 0 && daysSinceLastCare / c.cycles >= 1;
+          }
+          if (requiresInsert) {
+            if (!inserted) {
+              plants.add(p);
+              inserted = true;
+            }
+            cares[p.name]!.add(c.name);
+          }
         }
+        inserted = false;
       }
     } else {
       plants = allPlants;
-    }
-
-    setState(() => _plants = plants);
-  }
-
-  _waterAllPlants() async {
-    List<Plant> allPlants = await _plantRepository.getAllPlants();
-    Timestamp dateCheck = _dateFilterEnabled
-        ? Timestamp.fromDateTime(_dateFilter)
-        : Timestamp.now();
-
-    for (Plant p in allPlants) {
-      var cpsr = (dateCheck.compareTo(p.cares["water"]!.effected!) / 60 / 60 / 24).round();
-
-      if (cpsr >= p.cares["water"]!.cycles) {
-        p.cares["water"]!.effected = Timestamp.fromDateTime(
-            DateTime.now().subtract(const Duration(minutes: 5)));
-        await _plantRepository.updatePlant(p);
+      for (Plant p in allPlants) {
+        cares[p.name] = [];
+        for (Care c in p.cares) {
+          cares[p.name]!.add(c.name);
+        }
       }
     }
+
+    setState(() {
+      _cares = cares;
+      _plants = plants;
+    });
+  }
+
+  _careAllPlants() async {
+    List<Plant> allPlants = objectbox.plantBox.getAll();
+    DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
+
+    for (Plant p in allPlants) {
+      for (Care c in p.cares) {
+        var daysSinceLastCare = dateCheck.difference(c.effected!).inDays;
+        if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles >= 0) {
+          c.effected = DateTime.now();
+          objectbox.careBox.put(c);
+        }
+      }
+    }
+
     setState(() {
       _dateFilterEnabled = false;
       _loadPlants();
     });
   }
 
-  _deletePlant(Plant plant) async {
-    await _plantRepository.deletePlant(plant.name);
-    _loadPlants();
+  _openPlant(Plant plant) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CarePlantScreen(title: plant.name),
+        // Pass the arguments as part of the RouteSettings. The
+        // DetailScreen reads the arguments from these settings.
+        settings: RouteSettings(
+          arguments: plant,
+        ),
+      ),
+    );
+    setState(() {
+      _selectedIndex = 0;
+      _loadPlants();
+    });
   }
 
-  /*
-  _editPlant(Plant plant) async {
-    Plant updatedPlant = Plant.fromJson(plant.toJson());
-    updatedPlant.intensity = plant.intensity + 1;
-    await _plantRepository.updatePlant(updatedPlant);
-    _loadPlants();
+  List<Icon> _buildCares(BuildContext context, Plant plant) {
+    List<Icon> list = [];
+
+    for (var care in _cares[plant.name]!) {
+      list.add(
+        Icon(DefaultValues.getCare(context, care)!.icon,
+            color: DefaultValues.getCare(context, care)!.color),
+      );
+    }
+
+    return list;
   }
-   */
 
 // TODO: Make a collection of cards (102)
 // Replace this entire method
-  List<GestureDetector> _buildGridCards(BuildContext context) {
+  List<GestureDetector> _buildPlantCards(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
     return _plants.map((plant) {
       return GestureDetector(
-          onLongPress: () {
-            _deletePlant(plant);
-          },
-          onLongPressCancel: () {
-            print(plant.name);
+          onLongPressCancel: () async {
+            await _openPlant(plant);
           },
           child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
             clipBehavior: Clip.antiAlias,
-            // TODO: Adjust card heights (103)
+            elevation: 5,
             child: Column(
-              // TODO: Center items on the card (103)
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 AspectRatio(
-                  aspectRatio: 18 / 11,
-                  child: plant.picture!.contains("assets/")
+                  aspectRatio: 18 / 12,
+                  child: plant.picture!.contains("florae_avatar")
                       ? Image.asset(
                           plant.picture!,
-                          // TODO: Adjust the box size (102)
-                          fit: BoxFit.fitWidth,
+                          fit: BoxFit.fitHeight,
                         )
                       : Image.file(
                           File(plant.picture!),
-                          // TODO: Adjust the box size (102)
                           fit: BoxFit.fitWidth,
                         ),
                 ),
@@ -337,21 +489,32 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
                     child: Column(
-                      // TODO: Align labels to the bottom and center (103)
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      // TODO: Change innermost Column (103)
                       children: <Widget>[
-                        // TODO: Handle overflowing labels (103)
-                        Text(
-                          plant.name,
-                          style: theme.textTheme.headline6,
-                          maxLines: 1,
+                        FittedBox(
+                          fit: BoxFit.fitWidth,
+                          child: Text(
+                            plant.name,
+                            style: theme.textTheme.headline6,
+                            maxLines: 1,
+                          ),
                         ),
-                        const SizedBox(height: 8.0),
+                        const SizedBox(height: 6.0),
                         Text(
                           plant.description,
                           style: theme.textTheme.subtitle2,
                         ),
+                        const SizedBox(height: 8.0),
+                        SizedBox(
+                            height: 20.0,
+                            child: FittedBox(
+                              alignment: Alignment.centerLeft,
+                              child: plant.cares.isNotEmpty
+                                  ? Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: _buildCares(context, plant))
+                                  : null,
+                            )),
                       ],
                     ),
                   ),

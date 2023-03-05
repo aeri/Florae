@@ -1,16 +1,39 @@
-# florae
 
-Make your plants happy
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+    <img src="https://i.imgur.com/9MkniMo.png" alt="Logo" width="450">
+  </a>
 
-## Getting Started
+  <p align="center">
+     <i>Keep care of your green, leafy best friends</i>
+  </p>
+</div>
 
-This project is a starting point for a Flutter application.
+# About
 
-A few resources to get you started if this is your first Flutter project:
+Florae is a free application that will allow you to keep track of the care of your flowers and plants while respecting your freedom and privacy.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Why plants?
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+It is proven that having plants in rooms keeps you healthier and happier. They raise the air quality and humidity, absorb toxic substances and can improve productivity and concentration.
+
+Growing them and taking care of them is relatively simple but requires responsibility and being aware of the requirements of irrigation, pruning, cleaning, etc. 
+
+This app allows you to manage all the care of your plants and receive notifications when they require it.
+
+## Features
+
+* Easily manage your plants and the care they require.
+* Set care alerts with the desired delay time.
+* Consult future care for better planning.
+* Open source with no hidden costs.
+
+## Development
+
+This application is entirely built with Flutter, and its operation is only oriented to Android devices, this is due to some dependencies used for the alerts/notifications system and the restrictions in the iOS environment to issue them without proprietary dependencies.
+
+
+## License
+
+Code is released under the GNU General Public License v3.0.

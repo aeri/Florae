@@ -52,7 +52,8 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
       var daysSinceLastCare = DateTime.now().difference(c.effected!).inDays;
       print(
           "headless florae plant ${p.name} with days since last care $daysSinceLastCare");
-      if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles >= 0) {
+      // Report all unattended care, current and past
+      if (daysSinceLastCare != 0 && daysSinceLastCare / c.cycles >= 1) {
         plants.add(p.name);
         break;
       }

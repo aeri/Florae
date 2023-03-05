@@ -360,13 +360,24 @@ class _MyHomePageState extends State<MyHomePage> {
     DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
 
     bool inserted = false;
+    bool requiresInsert = false;
 
     if (_selectedIndex == 0) {
       for (Plant p in allPlants) {
         cares[p.name] = [];
         for (Care c in p.cares) {
           var daysSinceLastCare = dateCheck.difference(c.effected!).inDays;
-          if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles >= 0) {
+
+          // If calendar day selected, add only the care that must be attended on a certain day.
+          // Past care is assumed to have been correctly attended to in due time.
+          if (_dateFilterEnabled){
+            requiresInsert = daysSinceLastCare != 0 && daysSinceLastCare % c.cycles == 0;
+          }
+          // Else, add all unattended care, current and past
+          else{
+            requiresInsert = daysSinceLastCare != 0 && daysSinceLastCare / c.cycles >= 1;
+          }
+          if (requiresInsert) {
             if (!inserted) {
               plants.add(p);
               inserted = true;

@@ -1,0 +1,8 @@
+Florae es una aplicación libre que te permitirá llevar un control del cuidado de tus plantas respetando tu libertad y privacidad.
+
+* Características
+
+- Gestiona fácilmente tus plantas y los cuidados que requieren.
+- Establece alertas de atención con el intervalo de tiempo deseado.
+- Consulta los cuidados futuros para una mejor planificación.
+- Código abierto sin costes ocultos.

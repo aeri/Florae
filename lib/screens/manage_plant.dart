@@ -404,6 +404,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
             newPlant.cares.clear();
 
+            // Assign cares to plant
             cares.forEach((key, value) {
               if (value.cycles != 0) {
                 newPlant.cares.add(Care(

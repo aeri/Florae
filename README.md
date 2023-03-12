@@ -12,7 +12,7 @@
 
 # About
 
-Florae is a free application that will allow you to keep track of the care of your flowers and plants while respecting your freedom and privacy.
+Florae is a free application that will allow you to keep track of the care of your plants while respecting your freedom and privacy.
 
 ## Why plants?
 

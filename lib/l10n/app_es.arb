@@ -26,10 +26,10 @@
     "labelDescription": "Descripción",
     "labelLocation": "Ubicación",
     "exampleLocation": "por ej. Patio",
-    "labelDayPlanted": "Día de plantación",
+    "labelDayPlanted": "Plantada el día",
     "saveButton": "Guardar",
     "careAll": "¿Has atendido a todas tus plantas?",
-    "careAllBody": "Esta acción marcará como cuidadas todas las plantas que requiren atención.",
+    "careAllBody": "Esta acción establecerá como cuidadas todas las plantas que requiren atención.",
     "water": "Regar",
     "spray": "Pulverizar",
     "rotate": "Girar",
@@ -54,7 +54,7 @@
     "notificationInfo": "El tiempo entre notificaciones se restablecerá cuando accedas a la aplicación.\n\nTen en cuenta que algunos fabricantes aplican optimizaciones de batería muy agresivas que pueden provocar que las notificaciones no se emitan adecuadamente.",
     "careNotificationTitle": "Hay plantas que requieren atención",
     "careNotificationName": "Alertas de cuidados",
-    "careNotificationDescription": "Recibe notificaciones cuando tus plantas necesiten cuidados",
+    "careNotificationDescription": "Recibe notificaciones cuando tus plantas requieran atención",
     "deletePlantTitle": "Borrar planta",
     "deletePlantBody": "Vas a proceder a eliminar esta planta definitivamente, esta acción no se puede deshacer."
 }

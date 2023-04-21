@@ -123,7 +123,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
       if (widget.plant!.picture!.contains("florae_avatar")) {
         String? asset =
-            widget.plant!.picture!.replaceAll(RegExp(r'[^0-9]'), ''); // '23'
+            widget.plant!.picture!.replaceAll(RegExp(r'\D'), ''); // '23'
         _prefNumber = int.tryParse(asset) ?? 1;
       } else {
         _image = XFile(widget.plant!.picture!);
@@ -392,6 +392,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               _image!.saveTo(fileName);
             }
 
+            // Creates new plant object with previous id if we are editing
+            // or generates a Id if we are creating a new plant
             final newPlant = Plant(
                 id: widget.plant != null ? widget.plant!.id : 0,
                 name: nameController.text,
@@ -402,9 +404,10 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     : "assets/florae_avatar_$_prefNumber.png",
                 location: locationController.text);
 
-            newPlant.cares.clear();
 
             // Assign cares to plant
+            newPlant.cares.clear();
+
             cares.forEach((key, value) {
               if (value.cycles != 0) {
                 newPlant.cares.add(Care(

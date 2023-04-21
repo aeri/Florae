@@ -1,8 +1,11 @@
 import 'dart:io';
 
 import 'package:background_fetch/background_fetch.dart';
+import 'package:florae/objectbox.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:vector_graphics/vector_graphics.dart';
 import 'package:florae/data/plant.dart';
 import 'package:florae/notifications.dart' as notify;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -44,7 +47,14 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   @override
+  void dispose() {
+    objectbox.store.close();
+    super.dispose();
+  }
+
+  @override
   void initState() {
+
     super.initState();
     _loadPlants();
 
@@ -173,10 +183,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SvgPicture.asset(
+            SvgPicture(
               _selectedIndex == 0
-                  ? "assets/undraw_fall_thyk.svg"
-                  : "assets/undraw_blooming_re_2kc4.svg",
+                  ? const AssetBytesLoader("assets/undraw_fall_thyk.svg.vec")
+                  : const AssetBytesLoader("assets/undraw_blooming_re_2kc4.svg.vec"),
               semanticsLabel: 'Fall',
               alignment: Alignment.center,
               height: 250,
@@ -340,7 +350,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     title: "Manage plant", update: false),
               ));
           setState(() {
-            _selectedIndex = 1;
             _loadPlants();
           });
         },
@@ -438,7 +447,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
     setState(() {
-      _selectedIndex = 0;
       _loadPlants();
     });
   }
@@ -497,14 +505,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           fit: BoxFit.fitWidth,
                           child: Text(
                             plant.name,
-                            style: theme.textTheme.headline6,
+                            style: theme.textTheme.titleLarge,
                             maxLines: 1,
                           ),
                         ),
                         const SizedBox(height: 6.0),
                         Text(
                           plant.description,
-                          style: theme.textTheme.subtitle2,
+                          style: theme.textTheme.titleSmall,
                         ),
                         const SizedBox(height: 8.0),
                         SizedBox(

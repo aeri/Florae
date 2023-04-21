@@ -38,6 +38,10 @@ void _requestPermissions() {
         badge: true,
         sound: true,
       );
+
+  flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+      AndroidFlutterLocalNotificationsPlugin>()?.requestPermission();
+
 }
 
 Future<void> _createNotificationChannel(

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:background_fetch/background_fetch.dart';
+import 'package:florae/screens/error.dart';
 import 'package:flutter/material.dart';
 import 'data/box.dart';
 import 'data/plant.dart';
@@ -16,10 +17,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   objectbox = await ObjectBox.create();
-  print("florae: ENTERING MAIN");
 
+  // Set default locale for background service
   final prefs = await SharedPreferences.getInstance();
-
   String? locale = Platform.localeName.substring(0, 2);
   await prefs.setString('locale', locale);
 
@@ -103,6 +103,13 @@ class FloraeApp extends StatelessWidget {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
+        builder: (BuildContext context, Widget? widget) {
+          ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+            return ErrorPage(errorDetails: errorDetails);
+          };
+
+          return widget!;
+          },
         supportedLocales: const [
           Locale('en'), // English
           Locale('es'), // Spanish

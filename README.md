@@ -33,6 +33,13 @@ This app allows you to manage all the care of your plants and receive notificati
 
 This application is entirely built with Flutter, and its operation is only oriented to Android devices, this is due to some dependencies used for the alerts/notifications system and the restrictions in the iOS environment to issue them without proprietary dependencies.
 
+### Notifications
+
+Notifications may not be delivered correctly or may not be delivered at all, because some mobile device manufacturers integrate very aggressive battery optimizations that do not respect the original Android APIs. This makes it impossible for developers to universally implement applications that run tasks in the background.
+
+For this case a background activity is launched with a user-configurable frequency to analyze the plant database and check if any of them require attention and issue the corresponding notification.
+
+If your device is among those affected and notifications are not displayed, please consult: [Don't kill my app!](https://dontkillmyapp.com/)
 
 ## License
 

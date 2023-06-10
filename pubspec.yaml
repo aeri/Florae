@@ -75,10 +75,10 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/card-sample-image.jpg
-    - assets/undraw_fall_thyk.svg.vec
+    - assets/undraw_fall_thyk.svg
     - assets/undraw_gardening_re_e658.svg
     - assets/undraw_flowers_vx06.svg
-    - assets/undraw_blooming_re_2kc4.svg.vec
+    - assets/undraw_blooming_re_2kc4.svg
     - assets/undraw_different_love_a-3-rg.svg
     - assets/florae_avatar_1.png
     - assets/florae_avatar_2.png

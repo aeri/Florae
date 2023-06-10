@@ -1,11 +1,9 @@
 import 'dart:io';
 
 import 'package:background_fetch/background_fetch.dart';
-import 'package:florae/objectbox.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:vector_graphics/vector_graphics.dart';
 import 'package:florae/data/plant.dart';
 import 'package:florae/notifications.dart' as notify;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -183,10 +181,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SvgPicture(
+            SvgPicture.asset(
               _selectedIndex == 0
-                  ? const AssetBytesLoader("assets/undraw_fall_thyk.svg.vec")
-                  : const AssetBytesLoader("assets/undraw_blooming_re_2kc4.svg.vec"),
+                  ? "assets/undraw_fall_thyk.svg"
+                  : "assets/undraw_blooming_re_2kc4.svg",
               semanticsLabel: 'Fall',
               alignment: Alignment.center,
               height: 250,

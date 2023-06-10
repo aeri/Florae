@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:florae/data/plant.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
+import 'package:path_provider/path_provider.dart';
 import '../objectbox.g.dart';
 
 class ObjectBox {
@@ -21,15 +24,17 @@ class ObjectBox {
   static Future<ObjectBox> create() async {
     // Future<Store> openStore() {...} is defined in the generated objectbox.g.dart
 
-    String dbPath = (await defaultStoreDirectory()).path;
+    Directory? dbPath = (await getExternalStorageDirectory());
+
+    dbPath ??= (await defaultStoreDirectory());
+
     Store store;
 
-
-    if (Store.isOpen(dbPath)) {
-      store = Store.attach(getObjectBoxModel(), dbPath);
+    if (Store.isOpen(dbPath.path)) {
+      store = Store.attach(getObjectBoxModel(), dbPath.path);
     }
     else{
-      store = await openStore(directory: dbPath);
+      store = await openStore(directory: dbPath.path);
     }
     return ObjectBox._create(store);
   }

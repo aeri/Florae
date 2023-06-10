@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 
@@ -387,8 +388,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
           if (_formKey.currentState!.validate()) {
             if (_image != null) {
               final Directory directory =
-                  await getApplicationDocumentsDirectory();
-              fileName = directory.path + "/" + generateRandomString(10);
+                  await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
+              fileName = directory.path + "/" + generateRandomString(10) + p.extension(_image!.path);
               _image!.saveTo(fileName);
             }
 
@@ -403,6 +404,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     ? fileName
                     : "assets/florae_avatar_$_prefNumber.png",
                 location: locationController.text);
+
 
 
             // Assign cares to plant
@@ -434,10 +436,15 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     );
   }
 
-  String generateRandomString(int len) {
-    var r = Random();
-    return String.fromCharCodes(
-        List.generate(len, (index) => r.nextInt(33) + 89));
+  String generateRandomString(int length) {
+
+
+    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    Random _rnd = Random();
+
+    return String.fromCharCodes(Iterable.generate(
+        length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+
   }
 
   _loadPlants() async {

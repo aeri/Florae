@@ -2,7 +2,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-    <img src="https://i.imgur.com/9MkniMo.png" alt="Logo" width="450">
+    <img src="docs/banner.png" alt="Banner logo" width="450">
   </a>
 
   <p align="center">

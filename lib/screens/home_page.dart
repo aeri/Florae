@@ -196,11 +196,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 _selectedIndex == 0
                     ? AppLocalizations.of(context)!.mainNoCares
                     : AppLocalizations.of(context)!.mainNoPlants,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'NotoSans',
                   fontWeight: FontWeight.w500,
-                  fontSize: 25,
-                  color: Color(0x78000000),
+                  fontSize: 0.065 * MediaQuery.of(context).size.width,
+                  color: const Color(0x78000000),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -348,6 +348,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     title: "Manage plant", update: false),
               ));
           setState(() {
+            _selectedIndex = 1;
             _loadPlants();
           });
         },

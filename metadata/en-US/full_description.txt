@@ -1,4 +1,4 @@
-Florae is a free application that will allow you to keep track of the care of your plants while respecting your freedom and privacy.
+Florae is an open source application that will allow you to keep track of the care of your plants while respecting your freedom and privacy.
 
 Set reminders for basic plant care such as watering, pruning, cleaning, fertilizing, spraying, rotating, and transplanting.
 

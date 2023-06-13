@@ -45,9 +45,9 @@ If your device is among those affected and notifications are not displayed, plea
 
 ### Languages
 
-Florae is currently translated into the following languages: `English`, `Español`
+Florae is currently translated into the following languages: `English`, `Español` and `Français` thanks to Samuel Pernet.
 
-If you wish to contribute to Florae by adding a new language, just include the translation file in `lib/l10n`. I will be happy to accept your pull request.
+If you wish to contribute to Florae by adding a new language, just include the translation file in [`lib/l10n`](lib/l10n). I will be happy to accept your pull request.
 
 ## License
 

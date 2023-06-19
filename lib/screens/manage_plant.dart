@@ -5,8 +5,8 @@ import 'package:florae/data/default.dart';
 import 'package:florae/data/plant.dart';
 import 'package:florae/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:numberpicker/numberpicker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:path/path.dart' as p;
@@ -76,29 +76,37 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
   void _showIntegerDialog(String care) async {
     FocusManager.instance.primaryFocus?.unfocus();
+    String tempDaysValue = "";
+
     await showDialog<int>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text(AppLocalizations.of(context)!.selectDays),
-            content: StatefulBuilder(builder: (context, sbSetState) {
-              return NumberPicker(
-                  selectedTextStyle: const TextStyle(color: Colors.teal),
-                  value: cares[care]!.cycles,
-                  minValue: 0,
-                  maxValue: 60,
-                  onChanged: (value) {
-                    setState(() {
-                      cares[care]!.cycles = value;
-                    });
-                    sbSetState(() => cares[care]!.cycles =
-                        value); //* to change on dialog state
-                  });
-            }),
+            content: ListTile(
+                leading: const Icon(Icons.loop),
+                title: TextFormField(
+                  onChanged: (String txt) => tempDaysValue = txt,
+                  autofocus: true,
+                  initialValue: cares[care]!.cycles.toString(),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                ),
+                trailing: Text(AppLocalizations.of(context)!.days)),
             actions: [
               TextButton(
                 child: Text(AppLocalizations.of(context)!.ok),
                 onPressed: () {
+                  setState(() {
+                    var parsedDays = int.tryParse(tempDaysValue);
+                    if (parsedDays == null) {
+                      cares[care]!.cycles = 0;
+                    } else {
+                      cares[care]!.cycles = parsedDays;
+                    }
+                  });
                   Navigator.of(context).pop();
                 },
               )
@@ -387,9 +395,12 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
           String fileName = "";
           if (_formKey.currentState!.validate()) {
             if (_image != null) {
-              final Directory directory =
-                  await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
-              fileName = directory.path + "/" + generateRandomString(10) + p.extension(_image!.path);
+              final Directory directory = await getExternalStorageDirectory() ??
+                  await getApplicationDocumentsDirectory();
+              fileName = directory.path +
+                  "/" +
+                  generateRandomString(10) +
+                  p.extension(_image!.path);
               _image!.saveTo(fileName);
             }
 
@@ -404,8 +415,6 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     ? fileName
                     : "assets/florae_avatar_$_prefNumber.png",
                 location: locationController.text);
-
-
 
             // Assign cares to plant
             newPlant.cares.clear();
@@ -437,14 +446,12 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   }
 
   String generateRandomString(int length) {
-
-
-    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    const _chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
     Random _rnd = Random();
 
     return String.fromCharCodes(Iterable.generate(
         length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
-
   }
 
   _loadPlants() async {

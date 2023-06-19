@@ -38,7 +38,6 @@ dependencies:
   objectbox_flutter_libs: any
   path_provider: ^2.0.12
   image_picker: ^0.8.5+3
-  numberpicker: ^2.1.2
   flutter_svg: ^2.0.5
   intl: ^0.17.0
   flutter_localizations:

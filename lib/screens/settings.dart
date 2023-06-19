@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:numberpicker/numberpicker.dart';
 
 import 'package:florae/notifications.dart' as notify;
+import 'package:flutter/services.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,29 +20,38 @@ class _SettingsScreen extends State<SettingsScreen> {
 
   void _showIntegerDialog() async {
     FocusManager.instance.primaryFocus?.unfocus();
+
+    String tempHoursValue = "";
+
     await showDialog<int>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text(AppLocalizations.of(context)!.selectHours),
-            content: StatefulBuilder(builder: (context, builderState) {
-              return NumberPicker(
-                  selectedTextStyle: const TextStyle(color: Colors.teal),
-                  value: (notificationTempo / 60).round(),
-                  minValue: 1,
-                  maxValue: 24,
-                  onChanged: (value) {
-                    setState(() {
-                      notificationTempo = value * 60;
-                    });
-                    builderState(() => notificationTempo =
-                        value * 60); //* to change on dialog state
-                  });
-            }),
+            content: ListTile(
+                leading: const Icon(Icons.loop),
+                title: TextFormField(
+                  onChanged: (String txt) => tempHoursValue = txt,
+                  autofocus: true,
+                  initialValue: (notificationTempo / 60).round().toString(),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                ),
+                trailing: Text(AppLocalizations.of(context)!.hours)),
             actions: [
               TextButton(
                 child: Text(AppLocalizations.of(context)!.ok),
                 onPressed: () {
+                  setState(() {
+                    var parsedHours = int.tryParse(tempHoursValue);
+                    if (parsedHours == null) {
+                      notificationTempo = 1 * 60;
+                    } else {
+                      notificationTempo = parsedHours * 60;
+                    }
+                  });
                   Navigator.of(context).pop();
                 },
               )

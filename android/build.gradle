@@ -20,6 +20,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // for FDroid
+        mavenLocal()
         maven {
             // [required] background_fetch
             url "${project(':background_fetch').projectDir}/libs"

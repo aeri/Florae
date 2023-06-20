@@ -1,25 +1,10 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'dart:async';
-import 'dart:io';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-Future<void> _startForegroundService() async {
-  const AndroidNotificationDetails androidPlatformChannelSpecifics =
-      AndroidNotificationDetails('care_reminder', 'your channel name',
-          channelDescription: 'your channel description',
-          importance: Importance.max,
-          priority: Priority.high,
-          ticker: 'ticker');
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.startForegroundService(1, 'plain title', 'plain body',
-          notificationDetails: androidPlatformChannelSpecifics,
-          payload: 'item x');
-}
 
 void _requestPermissions() {
   flutterLocalNotificationsPlugin

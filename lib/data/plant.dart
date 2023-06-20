@@ -1,33 +1,17 @@
-import 'package:objectbox/objectbox.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'care.dart';
 
-@Entity()
-class Care {
-  int id = 0;
-  String name;
-  int cycles = 0;
-  @Property(type: PropertyType.date)
-  DateTime? effected;
+part 'plant.g.dart';
 
-  Care({required this.name, required this.cycles, required this.effected});
-
-  factory Care.fromJson(Map<String, dynamic> json) => Care(
-      cycles: json["cycles"], effected: json["effected"], name: json["name"]);
-
-  Map<String, dynamic> toJson() =>
-      {"cycles": cycles, "effected": effected, "name": name};
-}
-
-@Entity()
+@JsonSerializable(explicitToJson: true)
 class Plant {
   int id = 0;
   String name;
   String? location;
   String description;
-  @Property(type: PropertyType.date)
   DateTime createdAt;
   String? picture;
-
-  final cares = ToMany<Care>();
+  List<Care> cares = [];
 
   Plant(
       {required this.name,
@@ -35,21 +19,10 @@ class Plant {
       this.location,
       this.description = "",
       required this.createdAt,
-      this.picture});
+      this.picture,
+      required this.cares});
 
-  factory Plant.fromJson(Map<String, dynamic> json) => Plant(
-        name: json["name"],
-        location: json["location"],
-        description: json["description"],
-        createdAt: json["createdAt"],
-        picture: json["picture"],
-      );
+  factory Plant.fromJson(Map<String, dynamic> json) => _$PlantFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        "name": name,
-        "location": location,
-        "description": description,
-        "createdAt": createdAt,
-        "picture": picture,
-      };
+  Map<String, dynamic> toJson() => _$PlantToJson(this);
 }

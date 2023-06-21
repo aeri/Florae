@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:florae/notifications.dart' as notify;
 import 'package:flutter/services.dart';
-
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

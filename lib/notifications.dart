@@ -58,15 +58,15 @@ void initNotifications(String channelName, String channelDescription) async {
 
 Future singleNotification(String title, String body, int hashCode,
     {String? payload, String? sound}) async {
-  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+  AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails('care_reminder', 'Care reminder',
           icon: '@drawable/ic_stat_florae',
           channelDescription: 'Receive plants care notifications',
           importance: Importance.max,
           priority: Priority.high,
-          ticker: 'care_reminder');
+          ticker: title);
 
-  const NotificationDetails platformChannelSpecifics =
+  NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
   await flutterLocalNotificationsPlugin

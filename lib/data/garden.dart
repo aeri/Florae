@@ -10,6 +10,8 @@ class Garden {
   static Future<Garden> load() async {
     var store = await SharedPreferences.getInstance();
 
+    await store.reload();
+
     return (Garden(store));
   }
 

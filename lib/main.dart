@@ -1,22 +1,22 @@
 import 'dart:io';
-
 import 'package:background_fetch/background_fetch.dart';
 import 'package:florae/screens/error.dart';
 import 'package:flutter/material.dart';
-import 'data/box.dart';
+import 'data/care.dart';
 import 'data/plant.dart';
+import 'data/garden.dart';
 import 'screens/home_page.dart';
 import 'package:florae/notifications.dart' as notify;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-late ObjectBox objectbox;
+late Garden garden;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  objectbox = await ObjectBox.create();
+  garden = await Garden.load();
 
   // Set default locale for background service
   final prefs = await SharedPreferences.getInstance();
@@ -41,9 +41,10 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
   print("[BackgroundFetch] Headless event received: $taskId");
 
-  ObjectBox obx = await ObjectBox.create();
+  Garden gr = await Garden.load();
 
-  List<Plant> allPlants = obx.plantBox.getAll();
+  List<Plant> allPlants = await gr.getAllPlants();
+
   List<String> plants = [];
   String notificationTitle = "Plants require care";
 
@@ -59,8 +60,6 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
       }
     }
   }
-
-  obx.store.close();
 
   try {
     final prefs = await SharedPreferences.getInstance();
@@ -109,7 +108,7 @@ class FloraeApp extends StatelessWidget {
           };
 
           return widget!;
-          },
+        },
         supportedLocales: const [
           Locale('en'), // English
           Locale('es'), // Spanish

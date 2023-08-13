@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:florae/data/default.dart';
 import 'package:florae/data/plant.dart';
-import 'package:florae/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,6 +11,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
+
+import '../data/care.dart';
+import '../main.dart';
 
 class ManagePlantScreen extends StatefulWidget {
   const ManagePlantScreen(
@@ -123,8 +125,11 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     // If is an update, restore old cares
     if (widget.update && widget.plant != null) {
       for (var care in widget.plant!.cares) {
-        cares[care.name] =
-            Care(name: care.name, cycles: care.cycles, effected: care.effected);
+        cares[care.name] = Care(
+            name: care.name,
+            cycles: care.cycles,
+            effected: care.effected,
+            id: care.name.hashCode);
       }
       nameController.text = widget.plant!.name;
       descriptionController.text = widget.plant!.description;
@@ -148,7 +153,10 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     DefaultValues.getCares(context).forEach((key, value) {
       if (cares[key] == null) {
         cares[key] = Care(
-            cycles: value.defaultCycles, effected: DateTime.now(), name: key);
+            cycles: value.defaultCycles,
+            effected: DateTime.now(),
+            name: key,
+            id: key.hashCode);
       }
     });
   }
@@ -222,7 +230,6 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         child: _image == null
                             ? Image.asset(
                                 "assets/florae_avatar_$_prefNumber.png",
-                                // TODO: Adjust the box size (102)
                                 fit: BoxFit.fitWidth,
                               )
                             : Image.file(File(_image!.path)),
@@ -407,14 +414,17 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
             // Creates new plant object with previous id if we are editing
             // or generates a Id if we are creating a new plant
             final newPlant = Plant(
-                id: widget.plant != null ? widget.plant!.id : 0,
+                id: widget.plant != null
+                    ? widget.plant!.id
+                    : nameController.text.hashCode,
                 name: nameController.text,
                 createdAt: _planted,
                 description: descriptionController.text,
                 picture: _image != null
                     ? fileName
                     : "assets/florae_avatar_$_prefNumber.png",
-                location: locationController.text);
+                location: locationController.text,
+                cares: []);
 
             // Assign cares to plant
             newPlant.cares.clear();
@@ -422,18 +432,14 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
             cares.forEach((key, value) {
               if (value.cycles != 0) {
                 newPlant.cares.add(Care(
-                    cycles: value.cycles, effected: value.effected, name: key));
+                    cycles: value.cycles,
+                    effected: value.effected,
+                    name: key,
+                    id: key.hashCode));
               }
             });
 
-            // ObjectBox does not track ToMany changes
-            // https://github.com/objectbox/objectbox-dart/issues/326
-            if (widget.update && widget.plant != null) {
-              widget.plant!.cares.clear();
-              objectbox.plantBox.put(widget.plant!);
-            }
-
-            objectbox.plantBox.put(newPlant);
+            garden.addOrUpdatePlant(newPlant);
 
             Navigator.popUntil(context, ModalRoute.withName('/'));
           }
@@ -455,7 +461,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   }
 
   _loadPlants() async {
-    List<Plant> allPlants = objectbox.plantBox.getAll();
+    List<Plant> allPlants = await garden.getAllPlants();
+
     setState(() => _plants = allPlants);
   }
 

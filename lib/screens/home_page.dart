@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:intl/intl.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
+import '../data/care.dart';
 import '../data/default.dart';
 import '../main.dart';
 import 'manage_plant.dart';
@@ -46,13 +47,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    objectbox.store.close();
     super.dispose();
   }
 
   @override
   void initState() {
-
     super.initState();
     _loadPlants();
 
@@ -101,7 +100,8 @@ class _MyHomePageState extends State<MyHomePage> {
     print("[BackgroundFetch] Event received: $taskId");
 
     if (taskId == "flutter_background_fetch") {
-      List<Plant> allPlants = objectbox.plantBox.getAll();
+      List<Plant> allPlants = await garden.getAllPlants();
+
       List<String> plants = [];
 
       for (Plant p in allPlants) {
@@ -363,8 +363,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Plant> plants = [];
     Map<String, List<String>> cares = {};
 
-    List<Plant> allPlants = objectbox.plantBox.getAll();
-
+    List<Plant> allPlants = await garden.getAllPlants();
     DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
 
     bool inserted = false;
@@ -414,7 +413,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _careAllPlants() async {
-    List<Plant> allPlants = objectbox.plantBox.getAll();
+    List<Plant> allPlants = await garden.getAllPlants();
+
     DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
 
     for (Plant p in allPlants) {
@@ -422,9 +422,9 @@ class _MyHomePageState extends State<MyHomePage> {
         var daysSinceLastCare = dateCheck.difference(c.effected!).inDays;
         if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles >= 0) {
           c.effected = DateTime.now();
-          objectbox.careBox.put(c);
         }
       }
+      garden.updatePlant(p);
     }
 
     setState(() {
@@ -463,8 +463,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return list;
   }
 
-// TODO: Make a collection of cards (102)
-// Replace this entire method
   List<GestureDetector> _buildPlantCards(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 

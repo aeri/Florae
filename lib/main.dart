@@ -113,6 +113,7 @@ class FloraeApp extends StatelessWidget {
           Locale('en'), // English
           Locale('es'), // Spanish
           Locale('fr'), // French
+          Locale('nl'), // Dutch
         ],
         theme: ThemeData(
             primaryColor: Colors.teal,

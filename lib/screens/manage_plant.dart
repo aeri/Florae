@@ -131,6 +131,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
             effected: care.effected,
             id: care.name.hashCode);
       }
+      _planted = widget.plant!.createdAt;
       nameController.text = widget.plant!.name;
       descriptionController.text = widget.plant!.description;
       locationController.text = widget.plant!.location ?? "";
@@ -201,11 +202,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
         elevation: 0.0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
-        titleTextStyle: const TextStyle(
-            color: Colors.black54,
-            fontSize: 40,
-            fontWeight: FontWeight.w800,
-            fontFamily: "NotoSans"),
+        titleTextStyle: Theme.of(context).textTheme.displayLarge,
       ),
       //passing in the ListView.builder
       body: SingleChildScrollView(
@@ -276,7 +273,6 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     child: Column(children: <Widget>[
                       TextFormField(
                         controller: nameController,
-                        enabled: !widget.update,
                         validator: (value) {
                           if (widget.update) {
                             return null;
@@ -289,21 +285,12 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                           }
                           return null;
                         },
-                        cursorColor: Colors.teal,
+                        cursorColor: Theme.of(context).colorScheme.secondary,
                         maxLength: 20,
                         decoration: InputDecoration(
                           icon: const Icon(Icons.local_florist),
                           labelText: AppLocalizations.of(context)!.labelName,
-                          labelStyle: const TextStyle(
-                            decorationColor: Colors.teal,
-                          ),
-                          fillColor: Colors.teal,
-                          focusColor: Colors.teal,
-                          hoverColor: Colors.teal,
                           helperText: AppLocalizations.of(context)!.exampleName,
-                          enabledBorder: const UnderlineInputBorder(),
-                          focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.teal)),
                         ),
                       ),
                       TextFormField(
@@ -313,42 +300,24 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         maxLines: 3,
                         // when user presses enter it will adapt to it
                         controller: descriptionController,
-                        cursorColor: Colors.teal,
+                        cursorColor: Theme.of(context).colorScheme.secondary,
                         maxLength: 100,
                         decoration: InputDecoration(
                           icon: const Icon(Icons.topic),
                           labelText:
                               AppLocalizations.of(context)!.labelDescription,
-                          labelStyle: const TextStyle(
-                            decorationColor: Colors.teal,
-                          ),
-                          fillColor: Colors.teal,
-                          focusColor: Colors.teal,
-                          hoverColor: Colors.teal,
-                          enabledBorder: const UnderlineInputBorder(),
-                          focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.teal)),
                         ),
                       ),
                       TextFormField(
                         controller: locationController,
-                        cursorColor: Colors.teal,
+                        cursorColor: Theme.of(context).colorScheme.secondary,
                         maxLength: 20,
                         decoration: InputDecoration(
                           icon: const Icon(Icons.location_on),
                           labelText:
                               AppLocalizations.of(context)!.labelLocation,
-                          labelStyle: const TextStyle(
-                            decorationColor: Colors.teal,
-                          ),
-                          fillColor: Colors.teal,
-                          focusColor: Colors.teal,
-                          hoverColor: Colors.teal,
                           helperText:
                               AppLocalizations.of(context)!.exampleLocation,
-                          enabledBorder: const UnderlineInputBorder(),
-                          focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.teal)),
                         ),
                       ),
                     ]),
@@ -383,8 +352,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     DateTime? result = await showDatePicker(
                         context: context,
                         initialDate: DateTime.now(),
-                        firstDate:
-                            DateTime.now().subtract(const Duration(days: 1000)),
+                        firstDate: DateTime(1901, 1, 1),
                         lastDate: DateTime.now());
                     setState(() {
                       _planted = result ?? DateTime.now();
@@ -416,7 +384,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
             final newPlant = Plant(
                 id: widget.plant != null
                     ? widget.plant!.id
-                    : nameController.text.hashCode,
+                    : DateTime.now().microsecondsSinceEpoch,
                 name: nameController.text,
                 createdAt: _planted,
                 description: descriptionController.text,
@@ -446,7 +414,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
         },
         label: Text(AppLocalizations.of(context)!.saveButton),
         icon: const Icon(Icons.save),
-        backgroundColor: Colors.teal,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
     );
   }

@@ -1,19 +1,7 @@
-buildscript {
-    ext.kotlin_version = '1.7.10'
-    ext {
-        compileSdkVersion = 33                // or latest
-        targetSdkVersion = 33                // or latest
-        appCompatVersion = "1.4.2"           // or latest
-    }
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+ext {
+    compileSdkVersion = 34
+    targetSdkVersion = 34
+    appCompatVersion = "1.4.2"
 }
 
 allprojects {
@@ -37,6 +25,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) {
+tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

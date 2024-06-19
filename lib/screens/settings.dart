@@ -88,11 +88,7 @@ class _SettingsScreen extends State<SettingsScreen> {
         elevation: 0.0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
-        titleTextStyle: const TextStyle(
-            color: Colors.black54,
-            fontSize: 40,
-            fontWeight: FontWeight.w800,
-            fontFamily: "NotoSans"),
+        titleTextStyle: Theme.of(context).textTheme.displayLarge,
       ),
       //passing in the ListView.builder
       body: SingleChildScrollView(
@@ -177,7 +173,7 @@ class _SettingsScreen extends State<SettingsScreen> {
         },
         label: Text(AppLocalizations.of(context)!.saveButton),
         icon: const Icon(Icons.save),
-        backgroundColor: Colors.teal,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
     );
   }

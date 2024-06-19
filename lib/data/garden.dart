@@ -31,14 +31,12 @@ class Garden {
     List<Plant> allPlants = await getAllPlants();
     bool status;
 
-    var plantIndex =
-        allPlants.indexWhere((element) => element.name == plant.name);
+    var plantIndex = allPlants.indexWhere((element) => element.id == plant.id);
     if (plantIndex == -1) {
       allPlants.add(plant);
       status = false;
     } else {
-      allPlants[allPlants.indexWhere((element) => element.name == plant.name)] =
-          plant;
+      allPlants[plantIndex] = plant;
       status = true;
     }
     String jsonPlants = jsonEncode(allPlants);

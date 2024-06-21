@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:florae/data/default.dart';
 import 'package:florae/data/plant.dart';
@@ -14,6 +13,7 @@ import 'package:intl/intl.dart';
 
 import '../data/care.dart';
 import '../main.dart';
+import '../utils/random.dart';
 
 class ManagePlantScreen extends StatefulWidget {
   const ManagePlantScreen(
@@ -273,14 +273,11 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                     child: Column(children: <Widget>[
                       TextFormField(
                         controller: nameController,
-                        validator: (value) {
-                          if (widget.update) {
-                            return null;
-                          }
-                          if (value == null || value.isEmpty) {
+                        validator: (name) {
+                          if (name == null || name.isEmpty) {
                             return AppLocalizations.of(context)!.emptyError;
                           }
-                          if (findPlant(value) != null) {
+                          if (_plantExist(name)) {
                             return AppLocalizations.of(context)!.conflictError;
                           }
                           return null;
@@ -368,13 +365,14 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           String fileName = "";
+          String generatedId = generateRandomString(10);
           if (_formKey.currentState!.validate()) {
             if (_image != null) {
               final Directory directory = await getExternalStorageDirectory() ??
                   await getApplicationDocumentsDirectory();
               fileName = directory.path +
                   "/" +
-                  generateRandomString(10) +
+                  generatedId +
                   p.extension(_image!.path);
               _image!.saveTo(fileName);
             }
@@ -384,7 +382,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
             final newPlant = Plant(
                 id: widget.plant != null
                     ? widget.plant!.id
-                    : DateTime.now().microsecondsSinceEpoch,
+                    : generatedId.hashCode,
                 name: nameController.text,
                 createdAt: _planted,
                 description: descriptionController.text,
@@ -407,7 +405,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               }
             });
 
-            garden.addOrUpdatePlant(newPlant);
+            await garden.addOrUpdatePlant(newPlant);
 
             Navigator.popUntil(context, ModalRoute.withName('/'));
           }
@@ -419,22 +417,12 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     );
   }
 
-  String generateRandomString(int length) {
-    const _chars =
-        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-    Random _rnd = Random();
-
-    return String.fromCharCodes(Iterable.generate(
-        length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
-  }
 
   _loadPlants() async {
     List<Plant> allPlants = await garden.getAllPlants();
-
     setState(() => _plants = allPlants);
   }
 
-  Plant? findPlant(String name) => _plants
-      .cast()
-      .firstWhere((plant) => plant.name == name, orElse: () => null);
+  bool _plantExist(String name) => _plants.contains((plant) => plant.name == name);
+
 }

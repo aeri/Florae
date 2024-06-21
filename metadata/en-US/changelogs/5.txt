@@ -1,0 +1,6 @@
+* New Material 3 themes added
+* Now you can see in full screen the image of the plant.
+* Now it is possible to change the plant name.
+* Adapted plant grid for large screens
+* Fixed a problem with displaying the age of the plant
+* New languages added

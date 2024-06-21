@@ -51,7 +51,7 @@
     "testNotificationTitle": "Notificación de prueba de Florae",
     "testNotificationBody": "Esto es un mensaje de prueba",
     "aboutFloraeButton": "Sobre Florae",
-    "notificationInfo": "El periodo entre notificaciones se restablecerá cuando accedas a la aplicación.\n\nTen en cuenta que algunos fabricantes aplican optimizaciones de batería muy agresivas, que pueden provocar que las notificaciones no funcionen adecuadamente.",
+    "notificationInfo": "El periodo entre notificaciones se restablecerá cuando accedas a la aplicación.\n\nTen en cuenta que algunos fabricantes aplican optimizaciones de batería muy agresivas que pueden provocar que las notificaciones no funcionen adecuadamente.",
     "careNotificationTitle": "Hay plantas que requieren atención",
     "careNotificationName": "Alertas de cuidados",
     "careNotificationDescription": "Recibe notificaciones cuando tus plantas te necesiten",

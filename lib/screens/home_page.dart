@@ -429,7 +429,7 @@ class _MyHomePageState extends State<MyHomePage> {
           c.effected = DateTime.now();
         }
       }
-      garden.updatePlant(p);
+      await garden.updatePlant(p);
     }
 
     setState(() {

@@ -66,7 +66,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
             TextButton(
               child: Text(AppLocalizations.of(context)!.yes),
               onPressed: () async {
-                garden.deletePlant(plant);
+                await garden.deletePlant(plant);
 
                 Navigator.popUntil(context, ModalRoute.withName('/'));
               },
@@ -249,7 +249,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                       }
                     });
 
-                    garden.updatePlant(plant);
+                    await garden.updatePlant(plant);
                     Navigator.of(context).pop();
                   }
                 },

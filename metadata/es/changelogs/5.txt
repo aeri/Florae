@@ -1,0 +1,6 @@
+* Se añaden nuevos temas Material 3.
+* Ahora puedes ver en pantalla completa la foto de tu planta.
+* Ahora es posible cambiar el nombre de la planta.
+* Se mejora la disposición de elementos para pantallas grandes.
+* Se corrige un problema al mostrar la edad de la planta.
+* Se añaden nuevos idiomas.

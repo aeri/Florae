@@ -5,28 +5,11 @@ import 'dart:async';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-
 void _requestPermissions() {
   flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>()
-      ?.requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
-  flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          MacOSFlutterLocalNotificationsPlugin>()
-      ?.requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
-
-  flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin>()?.requestPermission();
-
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.requestNotificationsPermission();
 }
 
 Future<void> _createNotificationChannel(
@@ -44,10 +27,8 @@ Future<void> _createNotificationChannel(
 }
 
 void initNotifications(String channelName, String channelDescription) async {
-  //_startForegroundService();
   _requestPermissions();
   _createNotificationChannel("care_reminder", channelName, channelDescription);
-  //_createNotificationChannelGroup();
 
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@drawable/ic_stat_florae');

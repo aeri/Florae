@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:florae/data/plant.dart';
+import 'package:florae/screens/picture_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../data/care.dart';
@@ -65,7 +66,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
             TextButton(
               child: Text(AppLocalizations.of(context)!.yes),
               onPressed: () async {
-                garden.deletePlant(plant);
+                await garden.deletePlant(plant);
 
                 Navigator.popUntil(context, ModalRoute.withName('/'));
               },
@@ -115,7 +116,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
             IconButton(
               icon: const Icon(Icons.edit),
               iconSize: 25,
-              color: Colors.black54,
+              color: Theme.of(context).colorScheme.primary,
               tooltip: AppLocalizations.of(context)!.tooltipEdit,
               onPressed: () async {
                 await Navigator.push(
@@ -127,11 +128,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
               },
             )
           ],
-          titleTextStyle: const TextStyle(
-              color: Colors.black54,
-              fontSize: 40,
-              fontWeight: FontWeight.w800,
-              fontFamily: "NotoSans"),
+          titleTextStyle: Theme.of(context).textTheme.displayLarge,
         ),
         //passing in the ListView.builder
         body: SingleChildScrollView(
@@ -145,25 +142,38 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   elevation: 2,
-                  child: SizedBox(
-                      child: Column(
-                    children: <Widget>[
-                      ClipRRect(
-                        child: SizedBox(
-                          height: 220,
-                          child: plant.picture!.contains("assets/")
-                              ? Image.asset(
-                                  plant.picture!,
-                                  fit: BoxFit.fitHeight,
-                                )
-                              : Image.file(
-                                  File(plant.picture!),
-                                  fit: BoxFit.fitWidth,
-                                ),
+                  child: InkWell(
+                    onTap: () {
+                      if (!plant.picture!.contains("assets/")) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PictureViewer(
+                                    picture: plant.picture,
+                                  )),
+                        );
+                      }
+                    },
+                    child: SizedBox(
+                        child: Column(
+                      children: <Widget>[
+                        ClipRRect(
+                          child: SizedBox(
+                            height: 220,
+                            child: plant.picture!.contains("assets/")
+                                ? Image.asset(
+                                    plant.picture!,
+                                    fit: BoxFit.fitHeight,
+                                  )
+                                : Image.file(
+                                    File(plant.picture!),
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                          ),
                         ),
-                      ),
-                    ],
-                  )),
+                      ],
+                    )),
+                  ),
                 ),
                 Card(
                   semanticContainer: true,
@@ -239,13 +249,13 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                       }
                     });
 
-                    garden.updatePlant(plant);
+                    await garden.updatePlant(plant);
                     Navigator.of(context).pop();
                   }
                 },
                 label: Text(AppLocalizations.of(context)!.careButton),
                 icon: const Icon(Icons.check),
-                backgroundColor: Colors.teal,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
               )
             ],
           ),

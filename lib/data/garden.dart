@@ -31,14 +31,12 @@ class Garden {
     List<Plant> allPlants = await getAllPlants();
     bool status;
 
-    var plantIndex =
-        allPlants.indexWhere((element) => element.name == plant.name);
+    var plantIndex = allPlants.indexWhere((element) => element.id == plant.id);
     if (plantIndex == -1) {
       allPlants.add(plant);
       status = false;
     } else {
-      allPlants[allPlants.indexWhere((element) => element.name == plant.name)] =
-          plant;
+      allPlants[plantIndex] = plant;
       status = true;
     }
     String jsonPlants = jsonEncode(allPlants);
@@ -50,8 +48,7 @@ class Garden {
   Future<bool> deletePlant(Plant plant) async {
     List<Plant> allPlants = await getAllPlants();
 
-    var plantIndex =
-        allPlants.indexWhere((element) => element.name == plant.name);
+    var plantIndex = allPlants.indexWhere((element) => element.id == plant.id);
     if (plantIndex != -1) {
       allPlants.removeAt(plantIndex);
 
@@ -67,11 +64,9 @@ class Garden {
   Future<bool> updatePlant(Plant plant) async {
     List<Plant> allPlants = await getAllPlants();
 
-    var plantIndex =
-        allPlants.indexWhere((element) => element.name == plant.name);
+    var plantIndex = allPlants.indexWhere((element) => element.id == plant.id);
     if (plantIndex != -1) {
-      allPlants[allPlants.indexWhere((element) => element.name == plant.name)] =
-          plant;
+      allPlants[plantIndex] = plant;
 
       String jsonPlants = jsonEncode(allPlants);
       await store.setString("plants", jsonPlants);

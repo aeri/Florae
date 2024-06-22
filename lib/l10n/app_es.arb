@@ -1,14 +1,14 @@
 {
     "no": "No",
     "yes": "Sí",
-    "mainNoCares": "¡Genial! No hay plantas que requieran atención",
-    "mainNoPlants": "El jardín está vacío, ¿Plantamos algo?",
+    "mainNoCares": "¡Genial! No hay plantas que necesiten atención",
+    "mainNoPlants": "El jardín está vacío, ¿plantamos algo?",
     "buttonGarden": "Jardín",
     "buttonToday": "Hoy",
     "tooltipCareAll": "Cuidar todas las plantas",
     "tooltipShowCalendar": "Mostrar calendario",
     "tooltipSettings": "Ajustes",
-    "tooltipNewPlant": "Añadir nueva planta",
+    "tooltipNewPlant": "Añadir una nueva planta",
     "selectDays": "Número de días",
     "ok": "Aceptar",
     "every": "cada",
@@ -51,10 +51,10 @@
     "testNotificationTitle": "Notificación de prueba de Florae",
     "testNotificationBody": "Esto es un mensaje de prueba",
     "aboutFloraeButton": "Sobre Florae",
-    "notificationInfo": "El tiempo entre notificaciones se restablecerá cuando accedas a la aplicación.\n\nTen en cuenta que algunos fabricantes aplican agresivas optimizaciones de batería que pueden provocar que las notificaciones no se emitan adecuadamente.",
+    "notificationInfo": "El periodo entre notificaciones se restablecerá cuando accedas a la aplicación.\n\nTen en cuenta que algunos fabricantes aplican optimizaciones de batería muy agresivas que pueden provocar que las notificaciones no funcionen adecuadamente.",
     "careNotificationTitle": "Hay plantas que requieren atención",
     "careNotificationName": "Alertas de cuidados",
-    "careNotificationDescription": "Recibe notificaciones cuando tus plantas requieran atención",
+    "careNotificationDescription": "Recibe notificaciones cuando tus plantas te necesiten",
     "deletePlantTitle": "Borrar planta",
-    "deletePlantBody": "Vas a proceder a eliminar esta planta definitivamente, esta acción no se puede deshacer."
+    "deletePlantBody": "Esta acción eliminará la planta de forma definitiva. ¿Deseas hacerlo?"
 }

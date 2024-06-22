@@ -22,11 +22,7 @@ class ErrorPage extends StatelessWidget {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: const FittedBox(fit: BoxFit.fitWidth, child: Text("Error")),
-        titleTextStyle: const TextStyle(
-            color: Colors.black54,
-            fontSize: 40,
-            fontWeight: FontWeight.w800,
-            fontFamily: "NotoSans"),
+        titleTextStyle: Theme.of(context).textTheme.displayLarge,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(),
@@ -44,7 +40,7 @@ class ErrorPage extends StatelessWidget {
                   style: TextStyle(color: Colors.redAccent, fontSize: 45)),
             ),
             const Text(
-              "Something is not right here...",
+              "An error has occurred.",
               style: TextStyle(
                   color: Colors.redAccent,
                   fontSize: 25,
@@ -55,30 +51,39 @@ class ErrorPage extends StatelessWidget {
                   left: 20, bottom: 50, right: 20, top: 10),
               child: SelectableText(errorDetails.exception.toString(),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.black, fontSize: 20)),
+                  style: const TextStyle(fontSize: 20)),
             ),
             OutlinedButton.icon(
               icon: const Icon(Icons.error, size: 18),
-              style: TextButton.styleFrom(foregroundColor: Colors.redAccent, backgroundColor: Colors.white),
+              style: OutlinedButton.styleFrom(
+                side:const BorderSide(
+                  color: Colors.transparent,
+                ),
+                  foregroundColor: Colors.redAccent,
+                  backgroundColor: Colors.white),
               onPressed: () => showDialog<String>(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
                   title: const Text('Error details'),
-                  content:  SingleChildScrollView(
-                      scrollDirection: Axis.vertical, //.horizontal
-                      child: SelectableText(errorDetails.toString(),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              color: Colors.black, fontSize: 12, fontFamily: "monospace")),
-                    ),
+                  content: SingleChildScrollView(
+                    scrollDirection: Axis.vertical, //.horizontal
+                    child: SelectableText(errorDetails.toString(),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontSize: 12,
+                            fontFamily: "monospace")),
+                  ),
                   actions: <Widget>[
                     TextButton(
-                      onPressed: () => Clipboard.setData(ClipboardData(text: errorDetails.toString())),
-                      child: const Text('Copy', style: TextStyle(color: Colors.redAccent)),
+                      onPressed: () => Clipboard.setData(
+                          ClipboardData(text: errorDetails.toString())),
+                      child: const Text('Copy',
+                          style: TextStyle(color: Colors.redAccent)),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, 'OK'),
-                      child: const Text('OK', style: TextStyle(color: Colors.redAccent)) ,
+                      child: const Text('OK',
+                          style: TextStyle(color: Colors.redAccent)),
                     ),
                   ],
                 ),

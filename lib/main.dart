@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:florae/screens/error.dart';
+import 'package:florae/themes/darkTheme.dart';
+import 'package:florae/themes/lightTheme.dart';
 import 'package:flutter/material.dart';
 import 'data/care.dart';
 import 'data/plant.dart';
@@ -114,21 +116,12 @@ class FloraeApp extends StatelessWidget {
           Locale('es'), // Spanish
           Locale('fr'), // French
           Locale('nl'), // Dutch
+          Locale('zh'), // Chinese (Simplified, People's Republic of China)
+          Locale('ru'), // Russian
+          Locale('ar'), // Arabic
         ],
-        theme: ThemeData(
-            primaryColor: Colors.teal,
-            // This is the theme of your application.
-            //
-            // Try running your application with "flutter run". You'll see the
-            // application has a blue toolbar. Then, without quitting the app, try
-            // changing the primarySwatch below to Colors.green and then invoke
-            // "hot reload" (press "r" in the console where you ran "flutter run",
-            // or simply save your changes to "hot reload" in a Flutter IDE).
-            // Notice that the counter didn't reset back to zero; the application
-            // is not restarted.
-            primarySwatch: Colors.teal,
-            fontFamily: "NotoSans",
-            scaffoldBackgroundColor: Colors.grey[100]),
+        theme: buildLightThemeData(),
+        darkTheme: buildDarkThemeData(),
         home: const MyHomePage(title: 'Today'));
   }
 }

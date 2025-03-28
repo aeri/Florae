@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'data/care.dart';
 import 'data/plant.dart';
 import 'data/garden.dart';
+import 'l10n/app_localizations.dart';
 import 'screens/home_page.dart';
 import 'package:florae/notifications.dart' as notify;
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late Garden garden;

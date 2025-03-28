@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../data/care.dart';
 import '../data/default.dart';
+import '../l10n/app_localizations.dart';
 import '../main.dart';
 import 'manage_plant.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CarePlantScreen extends StatefulWidget {
   const CarePlantScreen({Key? key, required this.title}) : super(key: key);

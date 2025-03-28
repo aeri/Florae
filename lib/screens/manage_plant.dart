@@ -5,13 +5,13 @@ import 'package:florae/data/plant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 
 import '../data/care.dart';
+import '../l10n/app_localizations.dart';
 import '../main.dart';
 import '../utils/random.dart';
 

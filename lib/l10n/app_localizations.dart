@@ -336,7 +336,7 @@ abstract class AppLocalizations {
   /// No description provided for @now.
   ///
   /// In en, this message translates to:
-  /// **'Now'**
+  /// **'Today'**
   String get now;
 
   /// No description provided for @daysLeft.

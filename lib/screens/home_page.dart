@@ -1,23 +1,22 @@
 import 'dart:io';
 
 import 'package:background_fetch/background_fetch.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:florae/data/plant.dart';
 import 'package:florae/notifications.dart' as notify;
-
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:intl/intl.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../data/care.dart';
 import '../data/default.dart';
 import '../l10n/app_localizations.dart';
 import '../main.dart';
-import 'manage_plant.dart';
 import 'care_plant.dart';
+import 'manage_plant.dart';
 import 'settings.dart';
 
 enum Page { today, garden }
@@ -369,35 +368,21 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Plant> allPlants = await garden.getAllPlants();
     DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
 
-    bool inserted = false;
-    bool requiresInsert = false;
+    bool plantAlreadyInserted = false;
 
     if (_currentPage == Page.today) {
       for (Plant p in allPlants) {
         cares[p.name] = [];
         for (Care c in p.cares) {
-          var daysSinceLastCare = dateCheck.difference(c.effected!).inDays;
-
-          // If calendar day selected, add only the care that must be attended on a certain day.
-          // Past care is assumed to have been correctly attended to in due time.
-          if (_dateFilterEnabled) {
-            requiresInsert =
-                daysSinceLastCare != 0 && daysSinceLastCare % c.cycles == 0;
-          }
-          // Else, add all unattended care, current and past
-          else {
-            requiresInsert =
-                daysSinceLastCare != 0 && daysSinceLastCare / c.cycles >= 1;
-          }
-          if (requiresInsert) {
-            if (!inserted) {
+          if (c.isRequired(dateCheck, _dateFilterEnabled)) {
+            if (!plantAlreadyInserted) {
               plants.add(p);
-              inserted = true;
+              plantAlreadyInserted = true;
             }
             cares[p.name]!.add(c.name);
           }
         }
-        inserted = false;
+        plantAlreadyInserted = false;
       }
     } else {
       plants = allPlants;
@@ -420,12 +405,9 @@ class _MyHomePageState extends State<MyHomePage> {
   _careAllPlants() async {
     List<Plant> allPlants = await garden.getAllPlants();
 
-    DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
-
     for (Plant p in allPlants) {
       for (Care c in p.cares) {
-        var daysSinceLastCare = dateCheck.difference(c.effected!).inDays;
-        if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles >= 0) {
+        if (c.isRequired(DateTime.now(), false)) {
           c.effected = DateTime.now();
         }
       }

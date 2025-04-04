@@ -80,7 +80,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
   List<CheckboxListTile> _buildCares(BuildContext context, Plant plant) {
     return plant.cares.map((care) {
       int daysToCare =
-          care.cycles - DateTime.now().difference(care.effected!).inDays;
+          care.cycles - care.daysSinceLastCare(DateTime.now());
 
       if (careCheck[care] == null) {
         careCheck[care] = daysToCare <= 0;

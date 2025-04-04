@@ -123,7 +123,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clean => 'Clean';
 
   @override
-  String get now => 'Now';
+  String get now => 'Today';
 
   @override
   String get daysLeft => 'days left';

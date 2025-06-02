@@ -56,5 +56,7 @@
     "careNotificationName": "Alertas de cuidados",
     "careNotificationDescription": "Recibe notificaciones cuando tus plantas te necesiten",
     "deletePlantTitle": "Borrar planta",
-    "deletePlantBody": "Esta acción eliminará la planta de forma definitiva. ¿Deseas hacerlo?"
+    "deletePlantBody": "Esta acción eliminará la planta de forma definitiva. ¿Deseas hacerlo?",
+    "exportData": "Exportar datos",
+    "importData": "Importar datos",
 }

@@ -452,6 +452,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You are going to proceed to eliminate your plant definitively, this action cannot be undone.'**
   String get deletePlantBody;
+
+  /// No description provided for @exportData.
+  ///
+  /// In en, this message translates to:
+  /// **'Export garden'**
+  String get exportData;
+
+  /// No description provided for @importData.
+  ///
+  /// In en, this message translates to:
+  /// **'Import garden'**
+  String get importData;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

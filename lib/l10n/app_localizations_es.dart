@@ -181,4 +181,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deletePlantBody => 'Esta acción eliminará la planta de forma definitiva. ¿Deseas hacerlo?';
+
+  @override
+  String get exportData => 'Exportar datos';
+
+  @override
+  String get importData => 'Importar datos';
 }

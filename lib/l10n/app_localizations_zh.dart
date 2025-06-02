@@ -181,4 +181,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deletePlantBody => '您将彻底删除此植物，此操作无法撤销。';
+
+  @override
+  String get exportData => 'Export garden';
+
+  @override
+  String get importData => 'Import garden';
 }

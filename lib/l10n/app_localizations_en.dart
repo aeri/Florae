@@ -181,4 +181,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deletePlantBody => 'You are going to proceed to eliminate your plant definitively, this action cannot be undone.';
+
+  @override
+  String get exportData => 'Export garden';
+
+  @override
+  String get importData => 'Import garden';
 }

@@ -289,6 +289,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (context) =>
                         const SettingsScreen(title: "Settings Screen"),
                   ));
+              setState(() {
+                _loadPlants();
+              });
             },
           ),
         ],

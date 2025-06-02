@@ -3,6 +3,7 @@ import 'package:florae/notifications.dart' as notify;
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data/backup/manager.dart';
 import '../l10n/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -127,7 +128,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                   ListTile(
                       trailing: const Icon(Icons.arrow_right),
                       leading: const Icon(Icons.circle_notifications,
-                          color: Colors.red),
+                          color: Colors.purple),
                       title: Text(
                           AppLocalizations.of(context)!.testNotificationButton),
                       onTap: () {
@@ -138,6 +139,33 @@ class _SettingsScreen extends State<SettingsScreen> {
                       }),
                 ]),
               ),
+              Card(
+                  semanticContainer: true,
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Column(children: <Widget>[
+                    ListTile(
+                        trailing: const Icon(Icons.arrow_right),
+                        leading: const Icon(Icons.backup,
+                            color: Colors.orange),
+                        title:  Text(AppLocalizations.of(context)!.exportData),
+                        onTap: () async {
+                          await BackupManager.backup();
+
+                        }),
+                    ListTile(
+                        trailing: const Icon(Icons.arrow_right),
+                        leading: const Icon(Icons.restore_outlined,
+                            color: Colors.orange),
+                        title: Text(AppLocalizations.of(context)!.importData),
+                        onTap: () async {
+                          await BackupManager.restore();
+
+                        }),
+                  ])),
               Card(
                   semanticContainer: true,
                   clipBehavior: Clip.antiAliasWithSaveLayer,

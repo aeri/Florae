@@ -181,4 +181,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get deletePlantBody => 'Je gaat je plant definitief elimineren, deze actie kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get exportData => 'Export garden';
+
+  @override
+  String get importData => 'Import garden';
 }

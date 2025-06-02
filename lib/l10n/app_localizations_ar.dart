@@ -181,4 +181,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deletePlantBody => 'أنت على وشك حذف نباتك بشكل نهائي، هذا الفعل لا عودة عنه.';
+
+  @override
+  String get exportData => 'Export garden';
+
+  @override
+  String get importData => 'Import garden';
 }

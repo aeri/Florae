@@ -181,4 +181,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deletePlantBody => 'La suppression d\'une plante est définitive. Cette action est irréversible';
+
+  @override
+  String get exportData => 'Export garden';
+
+  @override
+  String get importData => 'Import garden';
 }

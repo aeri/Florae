@@ -181,4 +181,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deletePlantBody => 'Вы собираетесь полностью удалить своё растение. Это действие не может быть отменено.';
+
+  @override
+  String get exportData => 'Export garden';
+
+  @override
+  String get importData => 'Import garden';
 }

@@ -57,6 +57,8 @@
   "careNotificationDescription": "Receive plants care notifications",
   "deletePlantTitle": "Delete plant",
   "deletePlantBody": "You are going to proceed to eliminate your plant definitively, this action cannot be undone.",
+  "exportData": "Export garden",
+  "importData": "Import garden",
   "@helloWorld": {
     "description": "The conventional newborn programmer greeting"
   }

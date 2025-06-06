@@ -187,4 +187,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get importData => 'Import garden';
+
+  @override
+  String get atDay => 'Daytime';
+
+  @override
+  String get atEvening => 'In the evening';
+
+  @override
+  String get atNight => 'At night';
 }

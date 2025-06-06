@@ -187,4 +187,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get importData => 'Importar datos';
+
+  @override
+  String get atDay => 'Por el día';
+
+  @override
+  String get atEvening => 'Por la tarde';
+
+  @override
+  String get atNight => 'Por la noche';
 }

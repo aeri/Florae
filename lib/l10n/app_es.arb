@@ -59,4 +59,7 @@
     "deletePlantBody": "Esta acción eliminará la planta de forma definitiva. ¿Deseas hacerlo?",
     "exportData": "Exportar datos",
     "importData": "Importar datos",
+    "atDay": "Por el día",
+    "atEvening": "Por la tarde",
+    "atNight": "Por la noche"
 }

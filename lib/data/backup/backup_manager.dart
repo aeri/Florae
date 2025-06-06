@@ -55,18 +55,17 @@ class BackupManager {
         var save = Save.fromJson(rawSave);
 
         for (var plant in save.garden) {
-
           var binary = save.binaries.where((x) => x.id == plant.id);
-          if (binary.isNotEmpty){
+          if (binary.isNotEmpty) {
             var picture = binary.first;
 
-            var path = await saveBinaryToFile(base64Decode(picture.base64Data),picture.fileName);
+            var path = await saveBinaryToFile(
+                base64Decode(picture.base64Data), picture.fileName);
             plant.picture = path;
           }
 
           await garden.addOrUpdatePlant(plant);
         }
-
 
         return true;
       } else {
@@ -77,7 +76,8 @@ class BackupManager {
     }
   }
 
-  static Future<String> saveBinaryToFile(Uint8List binaryData, String fileName) async {
+  static Future<String> saveBinaryToFile(
+      Uint8List binaryData, String fileName) async {
     final Directory directory = await getExternalStorageDirectory() ??
         await getApplicationDocumentsDirectory();
 
@@ -88,6 +88,5 @@ class BackupManager {
     await file.writeAsBytes(binaryData);
 
     return file.path;
-
   }
 }

@@ -7,7 +7,7 @@ part of 'binary.dart';
 // **************************************************************************
 
 Binary _$BinaryFromJson(Map<String, dynamic> json) => Binary(
-      id: json['id'] as int,
+      id: (json['id'] as num).toInt(),
       base64Data: json['base64Data'] as String,
       fileName: json['fileName'] as String,
     );

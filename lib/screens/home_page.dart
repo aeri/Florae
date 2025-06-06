@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:background_fetch/background_fetch.dart';
 import 'package:florae/data/plant.dart';
+import 'package:florae/data/settings/settings_manager.dart';
 import 'package:florae/notifications.dart' as notify;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,8 +10,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../background_task.dart';
 import '../data/care.dart';
 import '../data/default.dart';
 import '../l10n/app_localizations.dart';
@@ -23,16 +24,6 @@ enum Page { today, garden }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -55,33 +46,26 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _loadPlants();
-
     initializeDateFormatting();
-
     initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    // Configure BackgroundFetch.
-    final prefs = await SharedPreferences.getInstance();
-    final int? notificationTempo = prefs.getInt('notificationTempo');
+    // Configure settings.
+    await SettingsManager.initializeSettings();
 
+    // Initialize settings.
     notify.initNotifications(AppLocalizations.of(context)!.careNotificationName,
         AppLocalizations.of(context)!.careNotificationDescription);
 
+    // Configure BackgroundFetch.
     try {
       var status = await BackgroundFetch.configure(
           BackgroundFetchConfig(
-              minimumFetchInterval: notificationTempo ?? 60,
-              forceAlarmManager: false,
+              minimumFetchInterval: 15,
               stopOnTerminate: false,
               startOnBoot: true,
               enableHeadless: true,
-              requiresBatteryNotLow: false,
-              requiresCharging: false,
-              requiresStorageNotLow: false,
-              requiresDeviceIdle: false,
               requiredNetworkType: NetworkType.NONE),
           _onBackgroundFetch,
           _onBackgroundFetchTimeout);
@@ -90,44 +74,18 @@ class _MyHomePageState extends State<MyHomePage> {
       print("[BackgroundFetch] configure ERROR: $e");
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
   }
 
   void _onBackgroundFetch(String taskId) async {
-    // This is the fetch-event callback.
     print("[BackgroundFetch] Event received: $taskId");
 
     if (taskId == "flutter_background_fetch") {
-      List<Plant> allPlants = await garden.getAllPlants();
-
-      List<String> plants = [];
-
-      for (Plant p in allPlants) {
-        for (Care c in p.cares) {
-          var daysSinceLastCare = DateTime.now().difference(c.effected!).inDays;
-          if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles == 0) {
-            plants.add(p.name);
-          }
-          break;
-        }
-      }
-
-      print("foreground florae detected plants " + plants.join(' '));
-
-      if (plants.isNotEmpty) {
-        notify.singleNotification(
-            AppLocalizations.of(context)!.careNotificationTitle,
-            plants.join(' '),
-            7);
-      }
+      await checkCaresAndNotify();
     }
     BackgroundFetch.finish(taskId);
   }
 
-  /// This event fires shortly before your task is about to timeout.  You must finish any outstanding work and call BackgroundFetch.finish(taskId).
   void _onBackgroundFetchTimeout(String taskId) {
     print("[BackgroundFetch] TIMEOUT: $taskId");
     BackgroundFetch.finish(taskId);

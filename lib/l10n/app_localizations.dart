@@ -464,6 +464,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Import garden'**
   String get importData;
+
+  /// No description provided for @atDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Daytime'**
+  String get atDay;
+
+  /// No description provided for @atEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'In the evening'**
+  String get atEvening;
+
+  /// No description provided for @atNight.
+  ///
+  /// In en, this message translates to:
+  /// **'At night'**
+  String get atNight;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

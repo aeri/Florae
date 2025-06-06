@@ -59,6 +59,9 @@
   "deletePlantBody": "You are going to proceed to eliminate your plant definitively, this action cannot be undone.",
   "exportData": "Export garden",
   "importData": "Import garden",
+  "atDay": "Daytime",
+  "atEvening": "In the evening",
+  "atNight": "At night",
   "@helloWorld": {
     "description": "The conventional newborn programmer greeting"
   }

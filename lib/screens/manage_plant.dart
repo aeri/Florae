@@ -46,20 +46,14 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   XFile? _image;
   int _prefNumber = 1;
 
-  Future getImageFromCam() async {
-    var image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 25);
-    setState(() {
-      _image = image;
-    });
-  }
-
-  Future getImageFromGallery() async {
-    var image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 25);
-    setState(() {
-      _image = image;
-    });
+  Future getExternalImage(ImageSource imageSource) async {
+    final image =
+        await _picker.pickImage(source: imageSource, imageQuality: 25);
+    if (image != null) {
+      setState(() {
+        _image = image;
+      });
+    }
   }
 
   void getPrefabImage() {
@@ -237,7 +231,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         IconButton(
-                          onPressed: getImageFromCam,
+                          onPressed: () => getExternalImage(ImageSource.camera),
                           icon: const Icon(Icons.add_a_photo),
                           tooltip:
                               AppLocalizations.of(context)!.tooltipCameraImage,
@@ -248,7 +242,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                             tooltip: AppLocalizations.of(context)!
                                 .tooltipNextAvatar),
                         IconButton(
-                          onPressed: getImageFromGallery,
+                          onPressed: () =>
+                              getExternalImage(ImageSource.gallery),
                           icon: const Icon(Icons.wallpaper),
                           tooltip:
                               AppLocalizations.of(context)!.tooltipGalleryImage,

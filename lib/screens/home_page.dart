@@ -425,7 +425,7 @@ class _MyHomePageState extends State<MyHomePage> {
     for (Plant p in allPlants) {
       for (Care c in p.cares) {
         var daysSinceLastCare = dateCheck.difference(c.effected!).inDays;
-        if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles >= 0) {
+        if (daysSinceLastCare != 0 && daysSinceLastCare % c.cycles == 0) {
           c.effected = DateTime.now();
         }
       }

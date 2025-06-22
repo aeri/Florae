@@ -99,7 +99,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get careAll => '¿Has atendido a todas tus plantas?';
 
   @override
-  String get careAllBody => 'Esta acción reiniciará los cuidados de todas las plantas que requieren atención.';
+  String get careAllBody =>
+      'Esta acción reiniciará los cuidados de todas las plantas que requieren atención.';
 
   @override
   String get water => 'Regar';
@@ -165,7 +166,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get aboutFloraeButton => 'Sobre Florae';
 
   @override
-  String get notificationInfo => 'El periodo entre notificaciones se restablecerá cuando accedas a la aplicación.\n\nTen en cuenta que algunos fabricantes aplican optimizaciones de batería muy agresivas que pueden provocar que las notificaciones no funcionen adecuadamente.';
+  String get notificationInfo =>
+      'El periodo entre notificaciones se restablecerá cuando accedas a la aplicación.\n\nTen en cuenta que algunos fabricantes aplican optimizaciones de batería muy agresivas que pueden provocar que las notificaciones no funcionen adecuadamente.';
 
   @override
   String get careNotificationTitle => 'Hay plantas que requieren atención';
@@ -174,13 +176,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get careNotificationName => 'Alertas de cuidados';
 
   @override
-  String get careNotificationDescription => 'Recibe notificaciones cuando tus plantas te necesiten';
+  String get careNotificationDescription =>
+      'Recibe notificaciones cuando tus plantas te necesiten';
 
   @override
   String get deletePlantTitle => 'Borrar planta';
 
   @override
-  String get deletePlantBody => 'Esta acción eliminará la planta de forma definitiva. ¿Deseas hacerlo?';
+  String get deletePlantBody =>
+      'Esta acción eliminará la planta de forma definitiva. ¿Deseas hacerlo?';
 
   @override
   String get exportData => 'Exportar datos';
@@ -189,10 +193,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get importData => 'Importar datos';
 
   @override
-  String get unsuccessfullyRestore => 'No se pudo restaurar la copia de seguridad.';
+  String get unsuccessfullyRestore =>
+      'No se pudo restaurar la copia de seguridad.';
 
   @override
-  String get unsuccessfullyBackup => 'No se pudo crear un fichero de copia de seguridad.';
+  String get unsuccessfullyBackup =>
+      'No se pudo crear un fichero de copia de seguridad.';
 
   @override
   String get atDay => 'Por el día';

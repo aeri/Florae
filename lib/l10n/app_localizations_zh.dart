@@ -165,7 +165,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutFloraeButton => '关于Florae';
 
   @override
-  String get notificationInfo => '输入后，提醒时间将会重新开始计算。\n\n请注意，有些设备进行了非常激进的电池优化，可能会导致无法正确发出提醒。';
+  String get notificationInfo =>
+      '输入后，提醒时间将会重新开始计算。\n\n请注意，有些设备进行了非常激进的电池优化，可能会导致无法正确发出提醒。';
 
   @override
   String get careNotificationTitle => '植物需要养护';

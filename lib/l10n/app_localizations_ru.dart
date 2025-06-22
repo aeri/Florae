@@ -15,7 +15,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get yes => 'Да';
 
   @override
-  String get mainNoCares => 'Ура! У вас нет растений, за которыми нужно ухаживать';
+  String get mainNoCares =>
+      'Ура! У вас нет растений, за которыми нужно ухаживать';
 
   @override
   String get mainNoPlants => 'Сад пуст. Может, стоит что-нибудь посадить?';
@@ -99,7 +100,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get careAll => 'Вы позаботились обо всех растениях?';
 
   @override
-  String get careAllBody => 'Это отметит уход за всем растениями на сегодняшний день.';
+  String get careAllBody =>
+      'Это отметит уход за всем растениями на сегодняшний день.';
 
   @override
   String get water => 'Полив';
@@ -165,7 +167,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aboutFloraeButton => 'О Florae';
 
   @override
-  String get notificationInfo => 'Время уведомление будет сброшено, когда вы откроете Приложение.\n\nПожалуйста, имейте ввиду, что некоторые устройства могут вести очень агрессивную оптимизацию батареи. Эта оптимизация может вызывать проблемы с отображением уведомлений.';
+  String get notificationInfo =>
+      'Время уведомление будет сброшено, когда вы откроете Приложение.\n\nПожалуйста, имейте ввиду, что некоторые устройства могут вести очень агрессивную оптимизацию батареи. Эта оптимизация может вызывать проблемы с отображением уведомлений.';
 
   @override
   String get careNotificationTitle => 'Растениям нужен уход';
@@ -180,7 +183,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deletePlantTitle => 'Удалить растение';
 
   @override
-  String get deletePlantBody => 'Вы собираетесь полностью удалить своё растение. Это действие не может быть отменено.';
+  String get deletePlantBody =>
+      'Вы собираетесь полностью удалить своё растение. Это действие не может быть отменено.';
 
   @override
   String get exportData => 'Export garden';

@@ -1,0 +1,3 @@
+* Las notificaciones de cuidados se pueden configurar en tres periodos diferentes.
+* Se pueden importar y exportar los datos para una copia de seguridad o transferir a otro dispositivo.
+* Se han corregido algún problema relacionado con la detección de cuidados.

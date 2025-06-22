@@ -8,7 +8,7 @@ part of 'plant.dart';
 
 Plant _$PlantFromJson(Map<String, dynamic> json) => Plant(
       name: json['name'] as String,
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       location: json['location'] as String?,
       description: json['description'] as String? ?? "",
       createdAt: DateTime.parse(json['createdAt'] as String),

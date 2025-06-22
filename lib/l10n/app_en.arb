@@ -37,7 +37,7 @@
   "fertilise": "Fertilise",
   "transplant": "Transplant",
   "clean": "Clean",
-  "now": "Now",
+  "now": "Today",
   "daysLeft": "days left",
   "daysLate": "Since",
   "tooltipEdit": "Edit this plant",
@@ -57,6 +57,13 @@
   "careNotificationDescription": "Receive plants care notifications",
   "deletePlantTitle": "Delete plant",
   "deletePlantBody": "You are going to proceed to eliminate your plant definitively, this action cannot be undone.",
+  "exportData": "Export garden",
+  "importData": "Import garden",
+  "unsuccessfullyRestore": "Unable to restore the backup.",
+  "unsuccessfullyBackup": "Unable to create a backup file.",
+  "atDay": "Daytime",
+  "atEvening": "In the evening",
+  "atNight": "At night",
   "@helloWorld": {
     "description": "The conventional newborn programmer greeting"
   }

@@ -19,8 +19,6 @@ class ErrorPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0.0,
 
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: const FittedBox(fit: BoxFit.fitWidth, child: Text("Error")),
         titleTextStyle: Theme.of(context).textTheme.displayLarge,
       ),

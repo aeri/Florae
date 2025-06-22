@@ -1,13 +1,15 @@
 import 'dart:io';
+
 import 'package:florae/data/plant.dart';
 import 'package:florae/screens/picture_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../data/care.dart';
 import '../data/default.dart';
+import '../l10n/app_localizations.dart';
 import '../main.dart';
 import 'manage_plant.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CarePlantScreen extends StatefulWidget {
   const CarePlantScreen({Key? key, required this.title}) : super(key: key);
@@ -79,8 +81,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
 
   List<CheckboxListTile> _buildCares(BuildContext context, Plant plant) {
     return plant.cares.map((care) {
-      int daysToCare =
-          care.cycles - DateTime.now().difference(care.effected!).inDays;
+      int daysToCare = care.cycles - care.daysSinceLastCare(DateTime.now());
 
       if (careCheck[care] == null) {
         careCheck[care] = daysToCare <= 0;

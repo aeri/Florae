@@ -1,17 +1,14 @@
-import 'dart:io';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:florae/screens/error.dart';
 import 'package:florae/themes/darkTheme.dart';
 import 'package:florae/themes/lightTheme.dart';
 import 'package:flutter/material.dart';
-import 'data/care.dart';
-import 'data/plant.dart';
-import 'data/garden.dart';
-import 'screens/home_page.dart';
-import 'package:florae/notifications.dart' as notify;
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'background_task.dart';
+import 'data/garden.dart';
+import 'l10n/app_localizations.dart';
+import 'screens/home_page.dart';
 
 late Garden garden;
 
@@ -19,11 +16,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   garden = await Garden.load();
-
-  // Set default locale for background service
-  final prefs = await SharedPreferences.getInstance();
-  String? locale = Platform.localeName.substring(0, 2);
-  await prefs.setString('locale', locale);
 
   runApp(const FloraeApp());
 
@@ -43,47 +35,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
   print("[BackgroundFetch] Headless event received: $taskId");
 
-  Garden gr = await Garden.load();
-
-  List<Plant> allPlants = await gr.getAllPlants();
-
-  List<String> plants = [];
-  String notificationTitle = "Plants require care";
-
-  for (Plant p in allPlants) {
-    for (Care c in p.cares) {
-      var daysSinceLastCare = DateTime.now().difference(c.effected!).inDays;
-      print(
-          "headless florae plant ${p.name} with days since last care $daysSinceLastCare");
-      // Report all unattended care, current and past
-      if (daysSinceLastCare != 0 && daysSinceLastCare / c.cycles >= 1) {
-        plants.add(p.name);
-        break;
-      }
-    }
-  }
-
-  try {
-    final prefs = await SharedPreferences.getInstance();
-
-    final String locale = prefs.getString('locale') ?? "en";
-
-    if (AppLocalizations.delegate.isSupported(Locale(locale))) {
-      final t = await AppLocalizations.delegate.load(Locale(locale));
-      notificationTitle = t.careNotificationTitle;
-    } else {
-      print("handless florae: unsupported locale " + locale);
-    }
-  } on Exception catch (_) {
-    print("handless florae: Failed to load locale");
-  }
-
-  if (plants.isNotEmpty) {
-    notify.singleNotification(notificationTitle, plants.join('\n'), 7);
-    print("headless florae detected plants " + plants.join(' '));
-  } else {
-    print("headless florae no plants require care");
-  }
+  await checkCaresAndNotify();
 
   print("[BackgroundFetch] Headless event finished: $taskId");
 

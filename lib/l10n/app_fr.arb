@@ -59,6 +59,8 @@
   "deletePlantBody": "La suppression d'une plante est définitive. Cette action est irréversible",
   "exportData": "Exporter des données",
   "importData": "Importer des données",
+  "unsuccessfullyRestore": "Impossible de restaurer la sauvegarde.",
+  "unsuccessfullyBackup": "Impossible de créer un fichier de sauvegarde.",
   "atDay": "De jour",
   "atEvening": "D'après-midi",
   "atNight": "De nuit",

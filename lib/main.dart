@@ -1,12 +1,9 @@
-import 'dart:io';
-
 import 'package:background_fetch/background_fetch.dart';
 import 'package:florae/screens/error.dart';
 import 'package:florae/themes/darkTheme.dart';
 import 'package:florae/themes/lightTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'background_task.dart';
 import 'data/garden.dart';

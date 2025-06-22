@@ -183,17 +183,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deletePlantBody => 'La suppression d\'une plante est définitive. Cette action est irréversible';
 
   @override
-  String get exportData => 'Export garden';
+  String get exportData => 'Exporter des données';
 
   @override
-  String get importData => 'Import garden';
+  String get importData => 'Importer des données';
 
   @override
-  String get atDay => 'Daytime';
+  String get unsuccessfullyRestore => 'Impossible de restaurer la sauvegarde.';
 
   @override
-  String get atEvening => 'In the evening';
+  String get unsuccessfullyBackup => 'Impossible de créer un fichier de sauvegarde.';
 
   @override
-  String get atNight => 'At night';
+  String get atDay => 'De jour';
+
+  @override
+  String get atEvening => 'D\'après-midi';
+
+  @override
+  String get atNight => 'De nuit';
 }

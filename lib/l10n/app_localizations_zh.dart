@@ -189,6 +189,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importData => 'Import garden';
 
   @override
+  String get unsuccessfullyRestore => 'Unable to restore the backup.';
+
+  @override
+  String get unsuccessfullyBackup => 'Unable to create a backup file.';
+
+  @override
   String get atDay => 'Daytime';
 
   @override

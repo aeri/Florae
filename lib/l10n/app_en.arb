@@ -59,6 +59,8 @@
   "deletePlantBody": "You are going to proceed to eliminate your plant definitively, this action cannot be undone.",
   "exportData": "Export garden",
   "importData": "Import garden",
+  "unsuccessfullyRestore": "Unable to restore the backup.",
+  "unsuccessfullyBackup": "Unable to create a backup file.",
   "atDay": "Daytime",
   "atEvening": "In the evening",
   "atNight": "At night",

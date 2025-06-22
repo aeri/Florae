@@ -465,6 +465,18 @@ abstract class AppLocalizations {
   /// **'Import garden'**
   String get importData;
 
+  /// No description provided for @unsuccessfullyRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to restore the backup.'**
+  String get unsuccessfullyRestore;
+
+  /// No description provided for @unsuccessfullyBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to create a backup file.'**
+  String get unsuccessfullyBackup;
+
   /// No description provided for @atDay.
   ///
   /// In en, this message translates to:

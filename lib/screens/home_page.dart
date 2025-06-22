@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       var status = await BackgroundFetch.configure(
           BackgroundFetchConfig(
-              minimumFetchInterval: 15,
+              minimumFetchInterval: 60,
               stopOnTerminate: false,
               startOnBoot: true,
               enableHeadless: true,

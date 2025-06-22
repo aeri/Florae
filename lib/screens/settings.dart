@@ -19,7 +19,7 @@ class _SettingsScreen extends State<SettingsScreen> {
   Settings settings = Settings();
 
   Future<void> getSettings() async {
-    var currentSettings =  await SettingsManager.getSettings();
+    var currentSettings = await SettingsManager.getSettings();
     setState(() {
       settings = currentSettings;
     });
@@ -76,7 +76,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                   ListTile(
                       trailing: const Icon(Icons.arrow_right),
                       leading: const Icon(Icons.circle_notifications,
-                          color: Colors.purple),
+                          color: Colors.red),
                       title: Text(
                           AppLocalizations.of(context)!.testNotificationButton),
                       onTap: () {
@@ -97,18 +97,30 @@ class _SettingsScreen extends State<SettingsScreen> {
                   child: Column(children: <Widget>[
                     ListTile(
                         trailing: const Icon(Icons.arrow_right),
-                        leading: const Icon(Icons.backup, color: Colors.orange),
+                        leading: const Icon(Icons.backup, color: Colors.blueGrey),
                         title: Text(AppLocalizations.of(context)!.exportData),
                         onTap: () async {
-                          await BackupManager.backup();
+                          var successfullyBackedUp =
+                              await BackupManager.backup();
+                          if (!successfullyBackedUp) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(AppLocalizations.of(context)!
+                                    .unsuccessfullyBackup)));
+                          }
                         }),
                     ListTile(
                         trailing: const Icon(Icons.arrow_right),
                         leading: const Icon(Icons.restore_outlined,
-                            color: Colors.orange),
+                            color: Colors.blueGrey),
                         title: Text(AppLocalizations.of(context)!.importData),
                         onTap: () async {
-                          await BackupManager.restore();
+                          var successfullyRestored =
+                              await BackupManager.restore();
+                          if (!successfullyRestored) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(AppLocalizations.of(context)!
+                                    .unsuccessfullyRestore)));
+                          }
                         }),
                   ])),
               Card(

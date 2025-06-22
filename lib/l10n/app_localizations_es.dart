@@ -189,6 +189,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get importData => 'Importar datos';
 
   @override
+  String get unsuccessfullyRestore => 'No se pudo restaurar la copia de seguridad.';
+
+  @override
+  String get unsuccessfullyBackup => 'No se pudo crear un fichero de copia de seguridad.';
+
+  @override
   String get atDay => 'Por el día';
 
   @override

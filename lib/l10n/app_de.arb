@@ -57,6 +57,13 @@
   "careNotificationDescription": "Benachrichtigungen zur Pflanzenpflege erhalten",
   "deletePlantTitle": "Pflanze löschen",
   "deletePlantBody": "Sie werden Ihre Pflanze nun endgültig beseitigen, diese Aktion kann nicht mehr rückgängig gemacht werden.",
+  "exportData": "Garten exportieren",
+  "importData": "Garten importieren",
+  "unsuccessfullyRestore": "Die Sicherung konnte nicht wiederhergestellt werden.",
+  "unsuccessfullyBackup": "Es konnte keine Sicherungsdatei erstellt werden.",
+  "atDay": "Morgens",
+  "atNoon": "Mittags",
+  "atNight": "Abends",
   "@helloWorld": {
     "description": "Die herkömmliche Begrüßung eines neugeborenen Programmierers"
   }

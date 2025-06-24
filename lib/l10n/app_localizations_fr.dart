@@ -205,7 +205,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get atDay => 'De jour';
 
   @override
-  String get atEvening => 'D\'après-midi';
+  String get atNoon => 'D\'après-midi';
 
   @override
   String get atNight => 'De nuit';

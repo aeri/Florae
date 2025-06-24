@@ -488,11 +488,11 @@ abstract class AppLocalizations {
   /// **'Daytime'**
   String get atDay;
 
-  /// No description provided for @atEvening.
+  /// No description provided for @atNoon.
   ///
   /// In en, this message translates to:
-  /// **'In the evening'**
-  String get atEvening;
+  /// **'At noon'**
+  String get atNoon;
 
   /// No description provided for @atNight.
   ///

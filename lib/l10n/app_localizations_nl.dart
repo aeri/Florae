@@ -203,7 +203,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get atDay => 'Daytime';
 
   @override
-  String get atEvening => 'In the evening';
+  String get atNoon => 'At noon';
 
   @override
   String get atNight => 'At night';

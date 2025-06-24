@@ -183,7 +183,7 @@ class _SettingsScreen extends State<SettingsScreen> {
       ListTile(
           trailing: const Icon(Icons.arrow_right),
           leading: const Icon(Icons.alarm, color: Colors.blue),
-          title: Text(AppLocalizations.of(context)!.atEvening),
+          title: Text(AppLocalizations.of(context)!.atNoon),
           subtitle: settings.eveningNotification != null
               ? Text(settings.eveningNotification!.format(context))
               : Text(AppLocalizations.of(context)!.never),

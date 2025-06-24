@@ -62,7 +62,7 @@
   "unsuccessfullyRestore": "Unable to restore the backup.",
   "unsuccessfullyBackup": "Unable to create a backup file.",
   "atDay": "Daytime",
-  "atEvening": "In the evening",
+  "atNoon": "At noon",
   "atNight": "At night",
   "@helloWorld": {
     "description": "The conventional newborn programmer greeting"

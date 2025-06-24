@@ -62,7 +62,7 @@
   "unsuccessfullyRestore": "Impossible de restaurer la sauvegarde.",
   "unsuccessfullyBackup": "Impossible de créer un fichier de sauvegarde.",
   "atDay": "De jour",
-  "atEvening": "D'après-midi",
+  "atNoon": "D'après-midi",
   "atNight": "De nuit",
   "@helloWorld": {
     "description": "La formule de politesse de tout programmeur"

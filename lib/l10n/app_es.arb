@@ -62,6 +62,6 @@
   "unsuccessfullyRestore": "No se pudo restaurar la copia de seguridad.",
   "unsuccessfullyBackup": "No se pudo crear un fichero de copia de seguridad.",
   "atDay": "Por el día",
-  "atEvening": "Por la tarde",
+  "atNoon": "Por la tarde",
   "atNight": "Por la noche"
 }

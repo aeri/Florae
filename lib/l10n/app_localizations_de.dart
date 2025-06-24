@@ -46,7 +46,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ok => 'OK';
 
   @override
-  String get every => 'jeden';
+  String get every => 'alle';
 
   @override
   String get days => 'Tage';
@@ -55,10 +55,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get never => 'nie';
 
   @override
-  String get titleEditPlant => 'bearbeiten';
+  String get titleEditPlant => 'Bearbeiten';
 
   @override
-  String get titleNewPlant => 'neu';
+  String get titleNewPlant => 'Neu';
 
   @override
   String get tooltipCameraImage => 'Bild von der Kamera abrufen';
@@ -104,28 +104,28 @@ class AppLocalizationsDe extends AppLocalizations {
       'Mit dieser Aktion werden alle Pflanzen als für den heutigen Zyklus gepflegt markiert.';
 
   @override
-  String get water => 'Wasser';
+  String get water => 'Gießen';
 
   @override
-  String get spray => 'Spray';
+  String get spray => 'Sprühen';
 
   @override
-  String get rotate => 'drehen';
+  String get rotate => 'Drehen';
 
   @override
-  String get prune => 'Pflaume';
+  String get prune => 'Schneiden';
 
   @override
-  String get fertilise => 'düngen';
+  String get fertilise => 'Düngen';
 
   @override
-  String get transplant => 'Transplantation';
+  String get transplant => 'Umpflanzen';
 
   @override
-  String get clean => 'sauber';
+  String get clean => 'Reinigen';
 
   @override
-  String get now => 'jezt';
+  String get now => 'Heute';
 
   @override
   String get daysLeft => 'Tage frei';
@@ -143,13 +143,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noCaresError => 'Wählen Sie mindestens eine Pflege';
 
   @override
-  String get careButton => 'Pflege';
+  String get careButton => 'Pflegen';
 
   @override
   String get selectHours => 'Stunden auswählen';
 
   @override
-  String get notifyEvery => 'Benachrichtigen Sie jeden';
+  String get notifyEvery => 'Benachrichtigung alle';
 
   @override
   String get hours => 'Stunden';
@@ -188,23 +188,25 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sie werden Ihre Pflanze nun endgültig beseitigen, diese Aktion kann nicht mehr rückgängig gemacht werden.';
 
   @override
-  String get exportData => 'Export garden';
+  String get exportData => 'Garten exportieren';
 
   @override
-  String get importData => 'Import garden';
+  String get importData => 'Garten importieren';
 
   @override
-  String get unsuccessfullyRestore => 'Unable to restore the backup.';
+  String get unsuccessfullyRestore =>
+      'Die Sicherung konnte nicht wiederhergestellt werden.';
 
   @override
-  String get unsuccessfullyBackup => 'Unable to create a backup file.';
+  String get unsuccessfullyBackup =>
+      'Es konnte keine Sicherungsdatei erstellt werden.';
 
   @override
-  String get atDay => 'Daytime';
+  String get atDay => 'Morgens';
 
   @override
-  String get atNoon => 'At noon';
+  String get atNoon => 'Mittags';
 
   @override
-  String get atNight => 'At night';
+  String get atNight => 'Abends';
 }

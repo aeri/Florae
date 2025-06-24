@@ -1,6 +1,6 @@
 ext {
-    compileSdkVersion = 34
-    targetSdkVersion = 34
+    compileSdkVersion = 35
+    targetSdkVersion = 35
     appCompatVersion = "1.4.2"
 }
 
@@ -16,11 +16,11 @@ allprojects {
         }
     }
 }
-
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
 subprojects {
     project.evaluationDependsOn(':app')
 }

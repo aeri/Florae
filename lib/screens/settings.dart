@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:florae/data/settings/settings_manager.dart';
 import 'package:florae/notifications.dart' as notify;
-import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+
+import '../data/backup/backup_manager.dart';
+import '../data/settings/settings.dart';
+import '../l10n/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key, required this.title}) : super(key: key);
@@ -14,61 +16,19 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreen extends State<SettingsScreen> {
-  int notificationTempo = 60;
+  Settings settings = Settings();
 
-  void _showIntegerDialog() async {
-    FocusManager.instance.primaryFocus?.unfocus();
-
-    String tempHoursValue = "";
-
-    await showDialog<int>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(AppLocalizations.of(context)!.selectHours),
-            content: ListTile(
-                leading: const Icon(Icons.loop),
-                title: TextFormField(
-                  onChanged: (String txt) => tempHoursValue = txt,
-                  autofocus: true,
-                  initialValue: (notificationTempo / 60).round().toString(),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                ),
-                trailing: Text(AppLocalizations.of(context)!.hours)),
-            actions: [
-              TextButton(
-                child: Text(AppLocalizations.of(context)!.ok),
-                onPressed: () {
-                  setState(() {
-                    var parsedHours = int.tryParse(tempHoursValue);
-                    if (parsedHours == null) {
-                      notificationTempo = 1 * 60;
-                    } else {
-                      notificationTempo = parsedHours * 60;
-                    }
-                  });
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        });
-  }
-
-  Future<void> getSharedPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> getSettings() async {
+    var currentSettings = await SettingsManager.getSettings();
     setState(() {
-      notificationTempo = prefs.getInt('notificationTempo') ?? 60;
+      settings = currentSettings;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    getSharedPrefs();
+    getSettings();
   }
 
   @override
@@ -104,17 +64,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: Column(children: <Widget>[
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.alarm, color: Colors.blue),
-                      title: Text(AppLocalizations.of(context)!.notifyEvery),
-                      subtitle: notificationTempo != 0
-                          ? Text((notificationTempo / 60).round().toString() +
-                              " ${AppLocalizations.of(context)!.hours}")
-                          : Text(AppLocalizations.of(context)!.never),
-                      onTap: () {
-                        _showIntegerDialog();
-                      }),
+                  ..._buildNotificationHours(),
                   ListTile(
                     leading: const Icon(Icons.info_outline_rounded),
                     subtitle: Transform.translate(
@@ -147,6 +97,42 @@ class _SettingsScreen extends State<SettingsScreen> {
                   child: Column(children: <Widget>[
                     ListTile(
                         trailing: const Icon(Icons.arrow_right),
+                        leading: const Icon(Icons.backup, color: Colors.blueGrey),
+                        title: Text(AppLocalizations.of(context)!.exportData),
+                        onTap: () async {
+                          var successfullyBackedUp =
+                              await BackupManager.backup();
+                          if (!successfullyBackedUp) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(AppLocalizations.of(context)!
+                                    .unsuccessfullyBackup)));
+                          }
+                        }),
+                    ListTile(
+                        trailing: const Icon(Icons.arrow_right),
+                        leading: const Icon(Icons.restore_outlined,
+                            color: Colors.blueGrey),
+                        title: Text(AppLocalizations.of(context)!.importData),
+                        onTap: () async {
+                          var successfullyRestored =
+                              await BackupManager.restore();
+                          if (!successfullyRestored) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(AppLocalizations.of(context)!
+                                    .unsuccessfullyRestore)));
+                          }
+                        }),
+                  ])),
+              Card(
+                  semanticContainer: true,
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Column(children: <Widget>[
+                    ListTile(
+                        trailing: const Icon(Icons.arrow_right),
                         leading: const Icon(Icons.text_snippet,
                             color: Colors.lightGreen),
                         title: Text(
@@ -155,7 +141,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                           showAboutDialog(
                             context: context,
                             applicationName: 'Florae',
-                            applicationVersion: '3.0.0',
+                            applicationVersion: '3.1.0',
                             applicationLegalese: '© Naval Alcalá',
                           );
                         }),
@@ -167,8 +153,7 @@ class _SettingsScreen extends State<SettingsScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setInt('notificationTempo', notificationTempo);
+          await SettingsManager.writeSettings(settings);
           Navigator.pop(context);
         },
         label: Text(AppLocalizations.of(context)!.saveButton),
@@ -176,5 +161,68 @@ class _SettingsScreen extends State<SettingsScreen> {
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
     );
+  }
+
+  List<Widget> _buildNotificationHours() {
+    return [
+      ListTile(
+          trailing: const Icon(Icons.arrow_right),
+          leading: const Icon(Icons.alarm, color: Colors.blue),
+          title: Text(AppLocalizations.of(context)!.atDay),
+          subtitle: settings.morningNotification != null
+              ? Text(settings.morningNotification!.format(context))
+              : Text(AppLocalizations.of(context)!.never),
+          onTap: () {
+            _showAlarmDialog(context, settings.morningNotification,
+                (selectedTime) {
+              setState(() {
+                settings.morningNotification = selectedTime;
+              });
+            });
+          }),
+      ListTile(
+          trailing: const Icon(Icons.arrow_right),
+          leading: const Icon(Icons.alarm, color: Colors.blue),
+          title: Text(AppLocalizations.of(context)!.atNoon),
+          subtitle: settings.eveningNotification != null
+              ? Text(settings.eveningNotification!.format(context))
+              : Text(AppLocalizations.of(context)!.never),
+          onTap: () {
+            _showAlarmDialog(context, settings.eveningNotification,
+                (selectedTime) {
+              setState(() {
+                settings.eveningNotification = selectedTime;
+              });
+            });
+          }),
+      ListTile(
+          trailing: const Icon(Icons.arrow_right),
+          leading: const Icon(Icons.alarm, color: Colors.blue),
+          title: Text(AppLocalizations.of(context)!.atNight),
+          subtitle: settings.nightNotification != null
+              ? Text(settings.nightNotification!.format(context))
+              : Text(AppLocalizations.of(context)!.never),
+          onTap: () {
+            _showAlarmDialog(context, settings.nightNotification,
+                (selectedTime) {
+              setState(() {
+                settings.nightNotification = selectedTime;
+              });
+            });
+          }),
+    ];
+  }
+
+  void _showAlarmDialog(BuildContext context, TimeOfDay? notification,
+      void Function(TimeOfDay?) onTimeChanged) async {
+    TimeOfDay? selectedTime = await showTimePicker(
+      context: context,
+      initialTime: notification ?? TimeOfDay.now(),
+    );
+
+    if (selectedTime == null) {
+      notification = null;
+    }
+    onTimeChanged(selectedTime);
   }
 }

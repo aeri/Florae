@@ -1,0 +1,3 @@
+* Care notifications can be configured in three different periods.
+* Data can be imported and exported for backup or transfer to another device.
+* Some bugs related to care detection have been fixed.

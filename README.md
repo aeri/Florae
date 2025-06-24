@@ -29,7 +29,6 @@ This app allows you to manage all the care of your plants and receive notificati
 
 ## Release
 
-<a href='https://play.google.com/store/apps/details?id=cat.naval.florae&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' width=200 src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
 <a href="https://f-droid.org/es/packages/cat.naval.florae">
     <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
     alt="Get it on F-Droid"
@@ -51,7 +50,7 @@ If your device is among those affected and notifications are not displayed, plea
 
 ### Languages
 
-Florae is currently translated into the following languages: `English`, `Español`, `Français`, `Nederlands`, `中文`, `Русский` and `Arabic`.
+Florae is currently translated into the following languages: `English`, `Español`, `Français`, `Nederlands`, `中文`, `Русский`, `Deutsch` and `Arabic`.
 
 If you wish to contribute to Florae by adding a new language, just include the translation file in [`lib/l10n`](lib/l10n). I will be happy to accept your pull request.
 

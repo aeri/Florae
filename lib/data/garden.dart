@@ -29,20 +29,20 @@ class Garden {
   // Return false if create
   Future<bool> addOrUpdatePlant(Plant plant) async {
     List<Plant> allPlants = await getAllPlants();
-    bool status;
+    bool alreadyExists;
 
     var plantIndex = allPlants.indexWhere((element) => element.id == plant.id);
     if (plantIndex == -1) {
       allPlants.add(plant);
-      status = false;
+      alreadyExists = false;
     } else {
       allPlants[plantIndex] = plant;
-      status = true;
+      alreadyExists = true;
     }
     String jsonPlants = jsonEncode(allPlants);
     await store.setString("plants", jsonPlants);
 
-    return status;
+    return alreadyExists;
   }
 
   Future<bool> deletePlant(Plant plant) async {

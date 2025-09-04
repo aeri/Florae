@@ -25,6 +25,7 @@ This app allows you to manage all the care of your plants and receive notificati
 * Easily manage your plants and the care they require.
 * Set care alerts with the desired delay time.
 * Consult future care for better planning.
+* Back up your entire garden safely to a single file.
 * Open source with no hidden costs.
 
 ## Release

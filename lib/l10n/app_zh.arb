@@ -48,7 +48,7 @@
   "notifyEvery": "提醒，每",
   "hours": "小时",
   "testNotificationButton": "测试提醒",
-  "testNotificationTitle": "Florae 测试提醒",
+  "testNotificationTitle": "Florae测试提醒",
   "testNotificationBody": "这是一条测试信息",
   "aboutFloraeButton": "关于Florae",
   "notificationInfo": "输入后，提醒时间将会重新开始计算。\n\n请注意，有些设备进行了非常激进的电池优化，可能会导致无法正确发出提醒。",

@@ -48,7 +48,7 @@
   "notifyEvery": "提醒，每",
   "hours": "小时",
   "testNotificationButton": "测试提醒",
-  "testNotificationTitle": "Florae测试提醒",
+  "testNotificationTitle": "Florae 测试提醒",
   "testNotificationBody": "这是一条测试信息",
   "aboutFloraeButton": "关于Florae",
   "notificationInfo": "输入后，提醒时间将会重新开始计算。\n\n请注意，有些设备进行了非常激进的电池优化，可能会导致无法正确发出提醒。",
@@ -57,7 +57,15 @@
   "careNotificationDescription": "接收植物养护提醒",
   "deletePlantTitle": "删除植物",
   "deletePlantBody": "您将彻底删除此植物，此操作无法撤销。",
+  "exportData": "导出花园",
+  "importData": "导入花园",
+  "unsuccessfullyRestore": "无法恢复备份。",
+  "unsuccessfullyBackup": "无法创建备份文件。",
+  "atDay": "白天",
+  "atNoon": "中午",
+  "atNight": "晚上",
   "@helloWorld": {
     "description": "传统的新生儿程序员问候语"
-  }
+  },
+  "@@locale": "zh"
 }

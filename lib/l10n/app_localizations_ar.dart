@@ -36,7 +36,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tooltipSettings => 'الإعدادات';
 
   @override
-  String get tooltipNewPlant => 'إضافة  غرس جديد';
+  String get tooltipNewPlant => 'إضافة غرس جديد';
 
   @override
   String get selectDays => 'إختر الأيام';
@@ -187,23 +187,23 @@ class AppLocalizationsAr extends AppLocalizations {
       'أنت على وشك حذف نباتك بشكل نهائي، هذا الفعل لا عودة عنه.';
 
   @override
-  String get exportData => 'Export garden';
+  String get exportData => 'تصدير حديقة';
 
   @override
-  String get importData => 'Import garden';
+  String get importData => 'إستيراد حديقة';
 
   @override
-  String get unsuccessfullyRestore => 'Unable to restore the backup.';
+  String get unsuccessfullyRestore => '.لم تُستعد النسخة الاحتياطية';
 
   @override
-  String get unsuccessfullyBackup => 'Unable to create a backup file.';
+  String get unsuccessfullyBackup => 'لم تٌنشئ النسخة الاحتياطية';
 
   @override
-  String get atDay => 'Daytime';
+  String get atDay => 'نهاراً';
 
   @override
-  String get atNoon => 'At noon';
+  String get atNoon => 'مساءً';
 
   @override
-  String get atNight => 'At night';
+  String get atNight => 'ليلاً';
 }
